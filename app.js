@@ -31,6 +31,11 @@ const authRoutes = require("./routes/auth");
 // Use Routes
 app.use("/api", authRoutes);
 
+// sample test route
+app.get("/my-app", (req, res) => {
+  res.send("hello.. tour app is running..");
+});
+
 //PORT
 const port = process.env.PORT || 3000;
 
