@@ -8,23 +8,31 @@ exports.checkNumber = async (req, res) => {
   
     const mobile = req.query.mobile;
 
-    // find the mobile number in DB
-    User.findOne({ mobile }, (err, user) => {
-      if (err || !user) {
-        return res.status(404).json({
-          mobile: mobile,
-          isMobileVerified: false,
-          isEmailRegistered: false,
-        });
-      }
+    if(mobile.length === 10) {
+      // find the mobile number in DB
+      User.findOne({ mobile }, (err, user) => {
+        if (err || !user) {
+          return res.status(404).json({
+            mobile: mobile,
+            isMobileVerified: false,
+            isEmailRegistered: false,
+          });
+        }
 
-      // else mobile number is found
-      return res.status(200).json({
-        mobile: user.mobile,
-        isMobileVerified: user.isMobileVerified,
-        isEmailRegistered: user.isEmailRegistered,
+        // else mobile number is found
+        return res.status(200).json({
+          mobile: user.mobile,
+          isMobileVerified: user.isMobileVerified,
+          isEmailRegistered: user.isEmailRegistered,
+        });
       });
-    });
+    }
+
+    else {
+      return res.status(400).json({
+        error: "enter valid mobile number"
+      });
+    }
 };
 
 exports.registerUser = async (req, res) => {
@@ -69,19 +77,27 @@ exports.sendOTP = async (req, res) => {
   
   const mobile = req.query.mobile;
 
-  fetch(
-    `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
-    {
-      method: "GET",
-      port: null,
-      headers: { "Content-Type": "application/json" },
-    }
-  )
-    .then((res) => res.json())
-    .then((json) => {
-      console.log(json);
-      return res.status(200).send(json);
+  if(mobile.length === 10) {
+    fetch(
+      `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
+      {
+        method: "GET",
+        port: null,
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
+        return res.status(200).send(json);
+      });
+  }
+
+  else {
+    return res.status(400).json({
+      error: "enter valid mobile number"
     });
+  }
 };
 
 exports.verifyOTP = async(req, res) => {
