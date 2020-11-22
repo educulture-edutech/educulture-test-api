@@ -21,6 +21,7 @@ mongoose
   .catch((err) => console.log("error in DB connection", err));
 
 //Middlewares
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(compression());

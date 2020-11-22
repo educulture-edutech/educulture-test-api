@@ -2,19 +2,6 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    mobile: {
-      type: String,
-      required: true,
-      trim: true,
-      unique: true,
-    },
-
-    isVerified: {
-      type: String,
-      trim: true,
-      default: false,
-    },
-
     firstName: {
       type: String,
       maxlength: 15,
@@ -29,16 +16,43 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    password: {
-      type: String,
-      required: true,
-    },
-
     email: {
       type: String,
       unique: true,
       required: true,
       trim: true,
+    },
+
+    isEmailRegistered: {
+      type: Boolean,
+      default: false,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
+    mobile: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+    },
+
+    isMobileVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    lastotp: {
+      type: String, 
+      trim: true
+    }, 
+
+    lastotptime: {
+      type: String, 
+      trim: true
     },
 
     role: {
@@ -52,6 +66,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
       maxlength: 6,
     },
+
+    lastLoginDate: {
+      type: String, 
+      trim: true,
+    }, 
+
+    lastLoginIP: {
+      type: String, 
+      trim: true
+    },
+
   },
 
   {

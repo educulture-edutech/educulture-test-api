@@ -1,11 +1,16 @@
-const express = require("express");
 const router = require("express").Router();
 
-const { checkNumber, registerUser } = require("../controllers/auth");
+const { checkNumber, registerUser, sendOTP, verifyOTP, loginUser } = require("../controllers/auth");
 
 // check the mobile number is present in the database or not
-router.post("/account/verification/check-number", checkNumber);
+router.get("/account/check-number", checkNumber);
 
 router.post("/account/register", registerUser);
+
+router.get("/account/sendOTP", sendOTP);
+
+router.get("/account/verifyOTP", verifyOTP);
+
+router.post("/account/login", loginUser);
 
 module.exports = router;
