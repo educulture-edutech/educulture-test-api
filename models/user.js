@@ -23,11 +23,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    isEmailRegistered: {
-      type: Boolean,
-      default: false,
-    },
-
     password: {
       type: String,
       required: true,
@@ -40,18 +35,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
-    isMobileVerified: {
-      type: Boolean,
-      default: false,
-    },
-
-    lastotp: {
-      type: String, 
-      trim: true
-    }, 
-
-    lastotptime: {
-      type: String, 
+    goalSelected: {
+      type: String,
       trim: true
     },
 
@@ -67,16 +52,22 @@ const userSchema = new mongoose.Schema(
       maxlength: 6,
     },
 
-    lastLoginDate: {
-      type: String, 
+    isAccountRegistered: {
+      type: Boolean, 
+      default: false,
       trim: true,
-    }, 
-
-    lastLoginIP: {
-      type: String, 
-      trim: true
     },
 
+    isAccountVerified: {
+      type: Boolean,
+      default: false, 
+      trim: true,
+    },
+
+    isGoalSelected: {
+      type: Boolean, 
+      default: false
+    }
   },
 
   {
@@ -85,3 +76,10 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("User", userSchema);
+
+/*
+
+goalSelected: 1000 - default, 1001 - mpsc, 1002 - 11th, 1003 - 12th
+
+
+*/

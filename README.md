@@ -8,12 +8,13 @@ Base URL: https://educulture.co.in/api
 	"firstName" : "string",
 	"lastName" : "string",
 	"email" : "string",
-	"isEmailRegistered" : boolean,
-	"password" : string,
-	"mobile" : string,
-	"isMobileVerified" : boolean,
-	"role" : number,
-	"gender" : "string"
+	"password" : "string",
+	"mobile" : "string",
+  "goalSelected" : "boolean",
+	"role" : "number",
+	"gender" : "string",
+  "isAccountRegistered" : "boolean"
+  "isAccountVerified" : "boolean",
 }
 ```
 
@@ -21,9 +22,9 @@ Base URL: https://educulture.co.in/api
 
 Returns the status of the mobile number and email address so as developer can propogate to
 
-1. login screen (if both isMobileVerifid is true and isEmailRegistered is true)
-2. registration screen (if both isMobileVerified is false and isEmailRegistered is false)
-3. enter mobile number to verify OTP screen (if isEmailRegistered is true and isMobileVerified is false)
+1. login screen (everythhing is true)
+2. registration screen (isAccountRegistered is false)
+3. verify OTP screen (isAccountVerified is false)
 
 - **URL**
 
@@ -51,8 +52,9 @@ Returns the status of the mobile number and email address so as developer can pr
     ```
     {
     	"mobile" : string,
-    	"isMobileVerified" : boolean,
-    	"isEmailRegistered" : boolean
+    	"isAccountRegistered" : boolean,
+    	"isAccountVerified" : boolean,
+      "isGoalSelected" : boolean
     }
     ```
 
@@ -109,14 +111,14 @@ Registers the user and after reister user will propogate to verify mobile number
 example:
 
 ```
-{
-"mobile" : "9423004286",
-"firstName" : "mayur",
-"lastName" : "aitavadekar",
-"email" : "mayuraitavadekar2690@gmail.com",
-"password" : "Pass@123",
-"gender" : "male"
-}
+  {
+  "mobile" : "9423004286",
+  "firstName" : "mayur",
+  "lastName" : "aitavadekar",
+  "email" : "mayuraitavadekar2690@gmail.com",
+  "password" : "Pass@123",
+  "gender" : "male"
+  }
 ```
 
 - **Success Response:**
@@ -124,17 +126,25 @@ example:
   - **Code:** 200 <br />
     **Content:**
 
+    save this response in localStorage.
+
   ```
   {
-  firstName: string,
-  lastName: string,
-  email: string,
-  isEmailRegistered: boolean,
-  mobile: string,
-  isMobileVerified: boolean,
-  gender: string,
-  role: number,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmE2Y2Q0MmNiN2EzZjNkZDA3Yzk2YzkiLCJpYXQiOjE2MDYwNTcwNTd9.TJ9CX65E_wOm_Ii7t6GADWDn0PZCq0IoBJKktG-uXps",
+    "user": {
+        "_id": "5fa6cd42cb7a3f3dd07c96c9",
+        "firstName": "mayur",
+        "lastName": "aitavadekar",
+        "email": "mayuraitavadekar2690@gmail.com",
+        "mobile": "9423004286",
+        "isGoalSelected": false,
+        "role": 0,
+        "gender": "male",
+        "isAccountRegistered": true,
+        "isAccountVerified" : false
+    }
   }
+
   ```
 
 - **Error Response:**
@@ -230,8 +240,8 @@ user will enter the OTP he received and get the response of verified or not.
 
   **Required:**
 
-  `otp`
-  `mobile`
+  `otp=[string]`
+  `mobile=[string]`
 
 - **Data Params**
 
@@ -247,6 +257,14 @@ user will enter the OTP he received and get the response of verified or not.
   ```
 
 - **Error Response:**
+
+  **Code:** 400 <br />
+
+  ```
+  {
+    error: "error in updating isAccountVerified flag"
+  }
+  ```
 
   - [error reponses are here.](https://docs.msg91.com/collection/msg91-api-integration/5/verify-otp/TZZKO2LI)
 
@@ -265,3 +283,155 @@ user will enter the OTP he received and get the response of verified or not.
     })
     .catch((err) => console.log("error in hitting getCourseByName by route"));
   ```
+
+## **5. Login**
+
+user will enter the mobile number and password to get the token and userdata from backend.
+
+- **URL**
+
+  `/account/login`
+
+- **Method:**
+
+  `POST`
+
+- **URL Params**
+
+  **Required:**
+
+  none
+
+- **Data Params**
+
+  `mobile=[string]`
+  `password=[string]`
+
+  example:
+
+  ```
+  {
+      "mobile" : "9423004286",
+      "password" : "Pass@123"
+  }
+  ```
+
+- **Success Response:**
+
+  - **Code:** 200 <br />
+    **Content:**
+
+  ```
+  {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmE2Y2Q0MmNiN2EzZjNkZDA3Yzk2YzkiLCJpYXQiOjE2MDYwNTcwNTd9.TJ9CX65E_wOm_Ii7t6GADWDn0PZCq0IoBJKktG-uXps",
+    "user": {
+        "_id": "5fa6cd42cb7a3f3dd07c96c9",
+        "firstName": "mayur",
+        "lastName": "aitavadekar",
+        "email": "mayuraitavadekar2690@gmail.com",
+        "mobile": "9423004286",
+        "isGoalSelected": true,
+        "role": 0,
+        "gender": "male",
+        "isAccountRegistered": true,
+        "isAccountVerified" : false
+    }
+  }
+  ```
+
+- **Error Response:**
+
+  **Code:** 404 <br />
+
+  ```
+  {
+      "error": "password does not match with mobile number."
+  }
+
+  ```
+
+- **Sample Call:**
+
+  ```
+    fetch(`${BASEURL}/account/login`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log("error in hitting getCourseByName by route"));
+  ```
+
+## **6. Update Goal**
+
+Get the goal Id selected by user and update in the document
+1001 - MPSC
+1002 - 11th standard
+1003 - 12th standard
+
+- **URL**
+
+  `/user/update-goal/${userId}`
+
+- **Method:**
+
+  `PUT`
+
+- **URL Params**
+
+  **Required:**
+
+  none
+
+- **Data Params**
+
+  `goalId=[string]`
+
+  example:
+
+  ```
+  {
+    goalId: "1001"
+  }
+  ```
+
+- **Success Response:**
+
+  - **Code:** 200 <br />
+    **Content:**
+
+    ```
+    { message: "success" }
+    ```
+
+- **Error Response:**
+
+  - **Code:** 404 NOT FOUND <br />
+    **Content:** `{ error: "user not found." }`
+
+- **Sample Call:**
+
+  ```
+    fetch(`${BASEURL}/user/update-goal/${userId}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify(data)
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .catch((err) => console.log("error in hitting getCourseByName by route"));
+  ```
+
+---

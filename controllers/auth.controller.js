@@ -7,23 +7,25 @@ const fetch = require("node-fetch");
 exports.checkNumber = async (req, res) => {
   
     const mobile = req.query.mobile;
-
+    
     if(mobile.length === 10) {
       // find the mobile number in DB
       User.findOne({ mobile }, (err, user) => {
         if (err || !user) {
           return res.status(404).json({
             mobile: mobile,
-            isMobileVerified: false,
-            isEmailRegistered: false,
+            isAccountRegistered: user.isAccountRegistered, 
+            isAccountVerified: isAccountVerified,
+            isGoalSelected: isGoalSelected,
           });
         }
 
         // else mobile number is found
         return res.status(200).json({
           mobile: user.mobile,
-          isMobileVerified: user.isMobileVerified,
-          isEmailRegistered: user.isEmailRegistered,
+          isAccountRegistered: user.isAccountRegistered,
+          isAccountVerified: user.isAccountVerified,
+          isGoalSelected: false,
         });
       });
     }
@@ -50,7 +52,7 @@ exports.registerUser = async (req, res) => {
     email: email,
     mobile: mobile,
     gender: gender,
-    isEmailRegistered: true,
+    isAccountRegistered: true, 
   });
 
   user.save((err, user) => {
@@ -60,16 +62,15 @@ exports.registerUser = async (req, res) => {
       });
     }
 
+    // after saving sign jwt token and return it
+    let token = jwt.sign({_id: user._id}, process.env.SECRET);
+
+    const {_id, firstName, lastName, email, mobile, role } = user;
+
     return res.status(200).json({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      isEmailRegistered: user.isEmailRegistered,
-      mobile: user.mobile,
-      isMobileVerified: user.isMobileVerified,
-      gender: user.gender,
-      role: user.role,
-    });
+      token, 
+      user: {_id, firstName, lastName, email, mobile, role, gender }
+    })
   });
 };
 
@@ -116,7 +117,22 @@ exports.verifyOTP = async(req, res) => {
     .then((res) => res.json())
     .then((json) => {
       console.log(json);
-      return res.status(200).send(json);
+      
+      // update the isAccountVerified field 
+      User.findOneAndUpdate(
+        { _id: req.profile._id},
+        { $set: {isAccountVerified: true }},
+        { new: true}
+      )
+      .exec((err, user) => {
+        if(err || !user) {
+          return res.status(400).json({
+              error: "error in updating isAccountVerified flag"
+          })    
+        }
+        
+        return res.status(200).send(json);
+      }); 
     });
 }
 
@@ -136,11 +152,11 @@ exports.loginUser = async(req, res) => {
         // if password is correct generate token
         let token = jwt.sign({_id: user._id}, process.env.SECRET);
 
-        const {_id, firstName, lastName, email, isEmailRegistered, mobile, isMobileVerified, role, gender } = user;
+        const {_id, firstName, lastName, email, isEmailRegistered, mobile, isMobileVerified, goalSelected, role, gender } = user;
 
         return res.status(200).json({
           token, 
-          user: {_id, firstName, lastName, email, isEmailRegistered, mobile, isMobileVerified, role, gender}
+          user: {_id, firstName, lastName, email, isEmailRegistered, goalSelected, mobile, isMobileVerified, role, gender}
         })
       }
 
@@ -151,3 +167,24 @@ exports.loginUser = async(req, res) => {
       }
   });
 }
+
+// auth middlewares
+
+exports.isSignIn = expressjwt({
+  secret: process.env.SECRET,
+  userProperty: "auth",
+  algorithms: ['RS256']
+});
+
+exports.isAuthenticated = (req, res, next) => {
+  let checker = req.profile && req.auth && req.profile._id == req.auth._id;
+  
+  if(!checker) {
+    return res.status(403).json({
+      error: "access denied."
+    })
+  }
+
+  next();
+}
+

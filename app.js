@@ -27,10 +27,12 @@ app.use(cors());
 app.use(compression());
 
 // Routes
-const authRoutes = require("./routes/auth");
+const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
 
 // Use Routes
 app.use("/api", authRoutes);
+app.use("/api", userRoutes);
 
 // sample test route
 app.get("/my-app", (req, res) => {
