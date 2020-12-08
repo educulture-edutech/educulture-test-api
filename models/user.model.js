@@ -36,8 +36,10 @@ const userSchema = new mongoose.Schema(
     },
 
     goalSelected: {
-      type: String,
-      trim: true
+      // type: Array,
+      // trim: true
+      type: String, 
+      trim: true,
     },
 
     role: {
@@ -67,6 +69,12 @@ const userSchema = new mongoose.Schema(
     isGoalSelected: {
       type: Boolean, 
       default: false
+    },
+
+    profileImage: {
+      type: String, 
+      trim: true, 
+      default: "https://raw.githubusercontent.com/educulture-edutech/icons/main/user.png"
     }
   },
 
@@ -76,10 +84,3 @@ const userSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("User", userSchema);
-
-/*
-
-goalSelected: 1000 - default, 1001 - mpsc, 1002 - 11th, 1003 - 12th
-
-
-*/

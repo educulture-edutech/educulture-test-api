@@ -5,8 +5,6 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const compression = require("compression");
 const mongoose = require("mongoose");
-const swaggerJSDoc = require("swagger-jsdoc");
-const swaggerUI = require("swagger-ui-express");
 
 // Database connection
 mongoose
@@ -14,6 +12,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   })
   .then(() => {
     console.log("DB CONNECTED");

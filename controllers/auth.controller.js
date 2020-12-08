@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require("../models/user.model");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const expressjwt = require("express-jwt");
@@ -6,17 +6,17 @@ const fetch = require("node-fetch");
 
 exports.checkNumber = async (req, res) => {
   
-    const mobile = req.query.mobile;
-    
+    const mobile =  req.query.mobile;
+
     if(mobile.length === 10) {
       // find the mobile number in DB
       User.findOne({ mobile }, (err, user) => {
         if (err || !user) {
           return res.status(404).json({
             mobile: mobile,
-            isAccountRegistered: user.isAccountRegistered, 
-            isAccountVerified: isAccountVerified,
-            isGoalSelected: isGoalSelected,
+            isAccountRegistered: false, 
+            isAccountVerified: false,
+            isGoalSelected: false,
           });
         }
 
@@ -65,11 +65,11 @@ exports.registerUser = async (req, res) => {
     // after saving sign jwt token and return it
     let token = jwt.sign({_id: user._id}, process.env.SECRET);
 
-    const {_id, firstName, lastName, email, mobile, role } = user;
+    const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
     return res.status(200).json({
       token, 
-      user: {_id, firstName, lastName, email, mobile, role, gender }
+      user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
     })
   });
 };
@@ -120,7 +120,7 @@ exports.verifyOTP = async(req, res) => {
       
       // update the isAccountVerified field 
       User.findOneAndUpdate(
-        { _id: req.profile._id},
+        { mobile: mobile},
         { $set: {isAccountVerified: true }},
         { new: true}
       )
@@ -150,13 +150,13 @@ exports.loginUser = async(req, res) => {
       // map password
       if(user.password === encry_password) {
         // if password is correct generate token
-        let token = jwt.sign({_id: user._id}, process.env.SECRET);
+        let token = jwt.sign({_id: user._id}, process.env.SECRET, {expiresIn: "1d"});
 
-        const {_id, firstName, lastName, email, isEmailRegistered, mobile, isMobileVerified, goalSelected, role, gender } = user;
+        const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
         return res.status(200).json({
           token, 
-          user: {_id, firstName, lastName, email, isEmailRegistered, goalSelected, mobile, isMobileVerified, role, gender}
+          user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
         })
       }
 
@@ -173,7 +173,7 @@ exports.loginUser = async(req, res) => {
 exports.isSignIn = expressjwt({
   secret: process.env.SECRET,
   userProperty: "auth",
-  algorithms: ['RS256']
+  algorithms: ['HS256'],
 });
 
 exports.isAuthenticated = (req, res, next) => {

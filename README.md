@@ -15,6 +15,8 @@ Base URL: https://educulture.co.in/api
 	"gender" : "string",
   "isAccountRegistered" : "boolean"
   "isAccountVerified" : "boolean",
+	"isGoalSelected": "boolean",
+  "profileImage": "string"
 }
 ```
 
@@ -112,12 +114,12 @@ example:
 
 ```
   {
-  "mobile" : "9423004286",
-  "firstName" : "mayur",
-  "lastName" : "aitavadekar",
-  "email" : "mayuraitavadekar2690@gmail.com",
-  "password" : "Pass@123",
-  "gender" : "male"
+	  "mobile" : "9423004286",
+	  "firstName" : "mayur",
+	  "lastName" : "aitavadekar",
+	  "email" : "mayuraitavadekar2690@gmail.com",
+	  "password" : "Pass@123",
+	  "gender" : "male"
   }
 ```
 
@@ -407,13 +409,13 @@ Get the goal Id selected by user and update in the document
     **Content:**
 
     ```
-    { message: "success" }
+    { message: "success", goalSelected: "1001" }
     ```
 
 - **Error Response:**
 
   - **Code:** 404 NOT FOUND <br />
-    **Content:** `{ error: "user not found." }`
+    **Content:** `{ error: "error in updating goals list" }`
 
 - **Sample Call:**
 
