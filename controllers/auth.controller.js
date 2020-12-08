@@ -25,7 +25,7 @@ exports.checkNumber = async (req, res) => {
           mobile: user.mobile,
           isAccountRegistered: user.isAccountRegistered,
           isAccountVerified: user.isAccountVerified,
-          isGoalSelected: false,
+          isGoalSelected: user.isGoalSelected,
         });
       });
     }
