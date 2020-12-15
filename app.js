@@ -28,10 +28,12 @@ app.use(compression());
 // Routes
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
+const subjectRoutes = require("./routes/subject.routes");
 
 // Use Routes
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", subjectRoutes);
 
 // sample test route
 app.get("/my-app", (req, res) => {
