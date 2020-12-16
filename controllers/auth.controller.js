@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const expressjwt = require("express-jwt");
 const fetch = require("node-fetch");
+const { runInNewContext } = require("vm");
 
 exports.checkNumber = async (req, res) => {
   
@@ -148,9 +149,15 @@ exports.loginUser = async(req, res) => {
   User.findOne({mobile}, (err, user) => {
       // mobile number will always be in DB. so no error
       // map password
+      if(err) {
+        return res.status(404).json({
+          error: "error in finding mobile number."
+        })
+      }
+
       if(user.password === encry_password) {
         // if password is correct generate token
-        let token = jwt.sign({_id: user._id}, process.env.SECRET, {expiresIn: "1d"});
+        let token = jwt.sign({_id: user._id}, process.env.SECRET);
 
         const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
@@ -197,3 +204,17 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
+exports.isTokenExpired = async (req, res, next) => {
+    const token = req.headers.authorization.split(" ")[1].toString();
+    jwt.verify(token, process.env.SECRET, (err, verifiedJwt) => {
+      if(err){
+        console.log(err);
+        let newToken = jwt.sign({_id: req.profile._id}, process.env.SECRET, {expiresIn: "1d"});
+        req.headers.authorization = `Bearer ${newToken}`;
+        console.log("newToken: ", req.headers.authorization);
+        next();
+      }else{
+        next();
+      }
+    })
+}

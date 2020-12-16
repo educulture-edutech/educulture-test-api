@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const compression = require("compression");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
 
 // Database connection
 mongoose
@@ -24,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(compression());
+app.use(helmet());
 
 // Routes
 const authRoutes = require("./routes/auth.routes");

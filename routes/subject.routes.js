@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const {getUserById} = require("../controllers/user.controller");
 const { isSignIn, isAuthenticated, isAdmin } = require("../controllers/auth.controller");
-const {createSubject, getAllSubjects, getSubjectById} = require("../controllers/subject.controller");
+const {createSubject, getAllSubjects, getSubjectById} = require("../controllers/subject.controller")
 
 // params
 router.param("userId", getUserById);

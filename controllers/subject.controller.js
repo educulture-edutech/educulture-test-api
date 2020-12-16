@@ -26,20 +26,50 @@ exports.getAllSubjects = async (req, res) => {
     
 	const goalId = req.profile.goalSelected;
 
+	// try {
+	// 	const subjects = await Subject.find({goalId: goalId});
+	// 	if(!subjects) {
+	// 		return res.status(404).json({
+    //             error: "no subject found for goal selected by user"
+    //         })
+	// 	}
+
+	// 	else {
+	// 		return res.status(200).json(subjects);
+	// 	}
+	// } catch (error) {
+	// 	console.log(error);
+	// 	return res.status(500).send(error)
+	// }
+
 	try {
 		const subjects = await Subject.find({goalId: goalId});
 		if(!subjects) {
 			return res.status(404).json({
                 error: "no subject found for goal selected by user"
-            })
+            });
 		}
-
 		else {
+			subjects.map((subject) => {
+				subject.subtopics = undefined;
+				subject.goalId = undefined;
+				subject.subjectDescription = undefined;
+				subject.instructor = undefined;
+				subject.instructorId = undefined;
+				subject.price = undefined;
+				subject.free = undefined;
+				subject.duration = undefined;
+				subject.createdAt = undefined;
+				subject.updatedAt = undefined;
+				subject.__v = undefined;
+			});
+
 			return res.status(200).json(subjects);
+
 		}
 	} catch (error) {
 		console.log(error);
-		return res.status(500).send(error)
+		return res.status(500).send(error);
 	}
 }
 
