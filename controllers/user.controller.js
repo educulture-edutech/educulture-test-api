@@ -50,15 +50,17 @@ exports.updateGoals = async(req, res) => {
 }
 
 exports.getAllGoals = async (req, res) => {
-    return res.status(200).json({
-        goalArray: [
-            {
-                goalId: "1001", 
-                goalName: "MPSC"
-            }
-        ] 
-    })
+
+    const arr = [
+        {
+            goalId: "1001", 
+            goalName: "MPSC"  
+        }
+    ]
+
+    return res.status(200).json(arr)
 }
+
 
 // exports.getAllSubjects = async (req, res) => {
 //     const goalId = req.profile.goalSelected;

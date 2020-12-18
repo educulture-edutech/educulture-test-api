@@ -31,6 +31,7 @@ app.use(helmet());
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const subjectRoutes = require("./routes/subject.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 // Use Routes
 app.use("/api", authRoutes);

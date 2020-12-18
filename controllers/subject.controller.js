@@ -1,6 +1,21 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
 
+// param function
+exports.getSubjectById = async (req, res, next, id) => {
+    Subject.findById(id).exec((err, subject) => {
+        if(err || !subject) {
+            return res.status(404).json({
+                error: "user not found"
+            })
+        }
+
+        // user found
+        req.subject = subject;
+        next();
+    })
+}
+
 exports.createSubject = async(req, res) => {
     
     const subject = new Subject(req.body);
