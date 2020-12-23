@@ -7,6 +7,7 @@ const fetch = require("node-fetch");
 exports.checkNumber = async (req, res) => {
   
     const mobile =  req.query.mobile;
+    const responseDTO = null;
 
     if(mobile.length === 10) {
       // find the mobile number in DB
@@ -22,10 +23,12 @@ exports.checkNumber = async (req, res) => {
 
         // else mobile number is found
         return res.status(200).json({
-          mobile: user.mobile,
-          isAccountRegistered: user.isAccountRegistered,
-          isAccountVerified: user.isAccountVerified,
-          isGoalSelected: user.isGoalSelected,
+          responseDTO: {
+            mobile: user.mobile,
+            isAccountRegistered: user.isAccountRegistered,
+            isAccountVerified: user.isAccountVerified,
+            isGoalSelected: user.isGoalSelected,
+          }
         });
       });
     }

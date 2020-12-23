@@ -1,8 +1,7 @@
 const Payment = require("../models/payments.model");
-const Subject = require("../models/subject.model");
 const User = require("../models/user.model");
 const dayjs = require("dayjs");
-const nanoid = require('nanoid');
+const { nanoid } = require("nanoid");
 
 exports.createReceipt = async (req, res) => {
     const {paymentType} = req.body;
@@ -19,9 +18,9 @@ exports.createReceipt = async (req, res) => {
             paymentType: paymentType,
             referenceId: referenceId,
             subjectPrice: req.subject.price,
-            cgst: "0",
-            sgst: "0",
-            totalAmount: (Number(subjectPrice) + Number(cgst) + Number(sgst)).toString(),
+            cgst: 0,
+            sgst: 0,
+            totalAmount: (Number(req.subject.price) + Number(0) + Number(0)).toString(),
             paymentStatus: "initiated"
         })
     
@@ -45,7 +44,7 @@ exports.paymentSuccess = async (req, res) => {
     const {paymentId, transactionId, paymentType, referenceId} = req.body;
 
     const purchaseDate = dayjs();
-    const expiryDate = purchaseDate.add(Number(duration), 'month');
+    const expiryDate = purchaseDate.add(Number(req.subject.duration), 'month');
 
     // initiate purchase object to push in userPurchaseList
     const purchase = {
@@ -67,7 +66,7 @@ exports.paymentSuccess = async (req, res) => {
 
         if(!payment) {
             return res.status(400).json({
-                error: "error in updation in payment-success api"
+                error: "no referenceId and paymentType is matched in db"
             })
         }
 

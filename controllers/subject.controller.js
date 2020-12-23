@@ -6,7 +6,7 @@ exports.getSubjectById = async (req, res, next, id) => {
     Subject.findById(id).exec((err, subject) => {
         if(err || !subject) {
             return res.status(404).json({
-                error: "user not found"
+                error: "subject not found for this id"
             })
         }
 
@@ -88,7 +88,7 @@ exports.getAllSubjects = async (req, res) => {
 	}
 }
 
-exports.getSubjectById = async (req, res) => {
+exports.getSubjectBySubjectId = async (req, res) => {
 	
 	const subjectId = req.query.subjectId;
 
