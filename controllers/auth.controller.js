@@ -76,10 +76,21 @@ exports.registerUser = async (req, res) => {
     const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
     return res.status(200).json({
-      responseDTO: {
-        token, 
-        user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
-      }
+        responseDTO: {
+          _id, 
+          token, 
+          firstName, 
+          lastName, 
+          email, 
+          mobile, 
+          goalSelected, 
+          role, 
+          gender, 
+          isAccountRegistered, 
+          isGoalSelected, 
+          isAccountVerified, 
+          profileImage 
+        }
     })
   });
 };
@@ -188,8 +199,19 @@ exports.loginUser = async(req, res) => {
 
         return res.status(200).json({
           responseDTO: {
+            _id, 
             token, 
-            user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
+            firstName, 
+            lastName, 
+            email, 
+            mobile, 
+            goalSelected, 
+            role, 
+            gender, 
+            isAccountRegistered, 
+            isGoalSelected, 
+            isAccountVerified, 
+            profileImage 
           }
         })
       }
