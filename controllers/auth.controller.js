@@ -8,7 +8,7 @@ exports.checkNumber = async (req, res) => {
   
     const mobile =  req.query.mobile;
 
-    if(mobile.length !== "undefined" || mobile.length === 10) {
+    if(typeof(mobile.length) !== "undefined" && mobile.length === 10) {
       // find the mobile number in DB
       User.findOne({ mobile }, (err, user) => {
         if (err || !user) {
