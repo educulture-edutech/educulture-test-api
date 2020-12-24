@@ -47,13 +47,13 @@ exports.registerUser = async (req, res) => {
 
   console.log(req.body);
 
-  const firstName = req.body.registrationDTO.firstName.toString();
-  const lastName = req.body.registrationDTO.lastName.toString();
-  const password = req.body.registrationDTO.password.toString();
-  const email = req.body.registrationDTO.email.toString();
-  const mobile = req.body.registrationDTO.mobile.toString();
-  const gender = req.body.registrationDTO.gender.toString();
-  const birthdate = req.body.registrationDTO.birthdate.toString();
+  const firstName = req.body.firstName.toString();
+  const lastName = req.body.lastName.toString();
+  const password = req.body.password.toString();
+  const email = req.body.email.toString();
+  const mobile = req.body.mobile.toString();
+  const gender = req.body.gender.toString();
+  const birthdate = req.body.birthdate.toString();
 
   // const {firstName, lastName, email, password, mobile, gender, birthdate} = req.body;
 
