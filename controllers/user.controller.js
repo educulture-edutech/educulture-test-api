@@ -6,7 +6,10 @@ exports.getUserById = async (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if(err || !user) {
             return res.status(404).json({
-                error: "user not found"
+                responseDTO: {
+                    error: "user not found"
+                }
+                
             })
         }
 
@@ -37,13 +40,17 @@ exports.updateGoals = async(req, res) => {
         .exec((err, user) => {
             if(err || !user) {
                 return res.status(400).json({
-                    error: "error in updating goals list"
+                    responseDTO: {
+                        error: "error in updating goals list"
+                    }
                 })
             }
     
             return res.status(200).json({
-                message: "success",
-                goalSelected: user.goalSelected
+                responseDTO: {
+                    message: "success",
+                    goalSelected: user.goalSelected
+                }
             });
         })
     })

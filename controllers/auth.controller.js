@@ -36,7 +36,9 @@ exports.checkNumber = async (req, res) => {
 
     else {
       return res.status(400).json({
-        error: "enter valid mobile number"
+        responseDTO: {
+          error: "enter valid mobile number"
+        }
       });
     }
 };
@@ -62,7 +64,9 @@ exports.registerUser = async (req, res) => {
   user.save((err, user) => {
     if (err || !user) {
       return res.status(400).json({
-        error: "error in saving information in DB",
+        responseDTO: {
+          error: "error in saving information in DB",
+        }
       });
     }
 
@@ -144,7 +148,7 @@ exports.verifyOTP = async(req, res) => {
             })    
           }
           
-          return res.status(200).send(json);
+          return res.status(200).json({responseDTO: json});
         }); 
       });
   }
@@ -192,7 +196,9 @@ exports.loginUser = async(req, res) => {
 
       else {
         return res.status(401).json({
-          error: "password does not match with mobile number."
+          responseDTO: {
+            error: "password does not match with mobile number."
+          }
         })
       }
   });
