@@ -120,7 +120,7 @@ exports.verifyOTP = async(req, res) => {
   const otp = req.query.otp;
   const mobile = req.query.mobile;
   
-  if(otp.length !== "undefined" && mobile.length !== "undefined") {
+  if(typeof(otp.length) !== "undefined" && typeof(mobile.length) !== "undefined" && mobile.length == 10) {
     fetch(
       `https://api.msg91.com/api/v5/otp/verify?mobile=91${mobile}&otp=${otp}&authkey=345746ARD5Rwyrwq9R5f998e59P1`,
       {
