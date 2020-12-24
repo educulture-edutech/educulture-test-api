@@ -36,7 +36,7 @@ exports.updateGoals = async(req, res) => {
         )
         .exec((err, user) => {
             if(err || !user) {
-                return res.status(404).json({
+                return res.status(400).json({
                     error: "error in updating goals list"
                 })
             }
@@ -58,7 +58,7 @@ exports.getAllGoals = async (req, res) => {
         }
     ]
 
-    return res.status(200).json(arr)
+    return res.status(200).json({responseDTO: arr});
 }
 
 

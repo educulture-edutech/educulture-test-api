@@ -7,17 +7,18 @@ const fetch = require("node-fetch");
 exports.checkNumber = async (req, res) => {
   
     const mobile =  req.query.mobile;
-    const responseDTO = null;
 
-    if(mobile.length === 10) {
+    if(mobile.length !== "undefined" || mobile.length === 10) {
       // find the mobile number in DB
       User.findOne({ mobile }, (err, user) => {
         if (err || !user) {
-          return res.status(404).json({
-            mobile: mobile,
-            isAccountRegistered: false, 
-            isAccountVerified: false,
-            isGoalSelected: false,
+          return res.status(200).json({
+            responseDTO: {
+              mobile: mobile,
+              isAccountRegistered: false, 
+              isAccountVerified: false,
+              isGoalSelected: false,
+            }  
           });
         }
 
@@ -59,7 +60,7 @@ exports.registerUser = async (req, res) => {
   });
 
   user.save((err, user) => {
-    if (err) {
+    if (err || !user) {
       return res.status(400).json({
         error: "error in saving information in DB",
       });
@@ -71,8 +72,10 @@ exports.registerUser = async (req, res) => {
     const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
     return res.status(200).json({
-      token, 
-      user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
+      responseDTO: {
+        token, 
+        user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
+      }
     })
   });
 };
@@ -81,7 +84,7 @@ exports.sendOTP = async (req, res) => {
   
   const mobile = req.query.mobile;
 
-  if(mobile.length === 10) {
+  if(typeof(mobile) !== "undefined" && mobile.length === 10) {
     fetch(
       `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
       {
@@ -93,13 +96,17 @@ exports.sendOTP = async (req, res) => {
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
-        return res.status(200).send(json);
+        return res.status(200).json({
+          responseDTO: json
+        });
       });
   }
 
   else {
     return res.status(400).json({
-      error: "enter valid mobile number"
+      responseDTO: {
+        error: "enter valid mobile number"
+      }
     });
   }
 };
@@ -109,34 +116,46 @@ exports.verifyOTP = async(req, res) => {
   const otp = req.query.otp;
   const mobile = req.query.mobile;
   
-  fetch(
-    `https://api.msg91.com/api/v5/otp/verify?mobile=91${mobile}&otp=${otp}&authkey=345746ARD5Rwyrwq9R5f998e59P1`,
-    {
-      method: "POST",
-      port: null,
-      headers: { "Content-Type": "application/json" },
-    }
-  )
-    .then((res) => res.json())
-    .then((json) => {
-      console.log(json);
-      
-      // update the isAccountVerified field 
-      User.findOneAndUpdate(
-        { mobile: mobile},
-        { $set: {isAccountVerified: true }},
-        { new: true}
-      )
-      .exec((err, user) => {
-        if(err || !user) {
-          return res.status(400).json({
-              error: "error in updating isAccountVerified flag"
-          })    
-        }
+  if(otp.length !== "undefined" && mobile.length !== "undefined") {
+    fetch(
+      `https://api.msg91.com/api/v5/otp/verify?mobile=91${mobile}&otp=${otp}&authkey=345746ARD5Rwyrwq9R5f998e59P1`,
+      {
+        method: "POST",
+        port: null,
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json);
         
-        return res.status(200).send(json);
-      }); 
+        // update the isAccountVerified field 
+        User.findOneAndUpdate(
+          { mobile: mobile},
+          { $set: {isAccountVerified: true }},
+          { new: true}
+        )
+        .exec((err, user) => {
+          if(err || !user) {
+            return res.status(404).json({
+              responseDTO: {
+                error: "error in updating isAccountVerified flag"
+              }
+            })    
+          }
+          
+          return res.status(200).send(json);
+        }); 
+      });
+  }
+  
+  else {
+    return res.status(400).json({
+      responseDTO: {
+        error: "enter valid otp and mobile number"
+      }
     });
+  }
 }
 
 exports.loginUser = async(req, res) => {
@@ -151,7 +170,7 @@ exports.loginUser = async(req, res) => {
   User.findOne({mobile}, (err, user) => {
       // mobile number will always be in DB. so no error
       // map password
-      if(err) {
+      if(err || !user) {
         return res.status(404).json({
           error: "error in finding mobile number."
         })
@@ -164,8 +183,10 @@ exports.loginUser = async(req, res) => {
         const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
         return res.status(200).json({
-          token, 
-          user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
+          responseDTO: {
+            token, 
+            user: {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage }
+          }
         })
       }
 
@@ -190,7 +211,9 @@ exports.isAuthenticated = (req, res, next) => {
   
   if(!checker) {
     return res.status(403).json({
-      error: "access denied."
+      responseDTO: {
+        error: "access denied."
+      }
     })
   }
 
@@ -200,7 +223,9 @@ exports.isAuthenticated = (req, res, next) => {
 exports.isAdmin = (req, res, next) => {
   if (req.profile.role === 0) {
     return res.status(403).json({
-      error: "not admin. access denied.",
+      responseDTO: {
+        error: "not admin. access denied.",
+      }
     });
   }
   next();
