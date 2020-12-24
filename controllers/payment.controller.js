@@ -52,8 +52,8 @@ exports.paymentSuccess = async (req, res) => {
         subjectId: req.subject.subjectId, 
         thumbnail: req.subject.thumbnail, 
         isExpired: false, 
-        purchaseDate: purchaseDate,
-        expiryDate: expiryDate,
+        purchaseDate: purchaseDate.format(),
+        expiryDate: expiryDate.format(),
         duration: req.subject.duration,
         referenceId: referenceId
     }

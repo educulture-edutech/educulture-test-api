@@ -44,7 +44,7 @@ exports.checkNumber = async (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, mobile, gender } = req.body;
+  const { firstName, lastName, email, password, mobile, gender, birthdate } = req.body;
 
   const encry_password = crypto
     .createHmac("sha256", process.env.SECRET)
@@ -58,6 +58,7 @@ exports.registerUser = async (req, res) => {
     email: email,
     mobile: mobile,
     gender: gender,
+    birthdate: birthdate,
     isAccountRegistered: true, 
   });
 
@@ -73,7 +74,7 @@ exports.registerUser = async (req, res) => {
     // after saving sign jwt token and return it
     let token = jwt.sign({_id: user._id}, process.env.SECRET);
 
-    const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
+    const {_id, firstName, lastName, email, mobile, birthdate, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
     return res.status(200).json({
         responseDTO: {
@@ -83,6 +84,7 @@ exports.registerUser = async (req, res) => {
           lastName, 
           email, 
           mobile, 
+          birthdate,
           goalSelected, 
           role, 
           gender, 
@@ -195,7 +197,7 @@ exports.loginUser = async(req, res) => {
         // if password is correct generate token
         let token = jwt.sign({_id: user._id}, process.env.SECRET);
 
-        const {_id, firstName, lastName, email, mobile, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
+        const {_id, firstName, lastName, email, mobile, birthdate, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
         return res.status(200).json({
           responseDTO: {
@@ -205,6 +207,7 @@ exports.loginUser = async(req, res) => {
             lastName, 
             email, 
             mobile, 
+            birthdate,
             goalSelected, 
             role, 
             gender, 

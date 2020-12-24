@@ -69,7 +69,7 @@ const subjectSchema = new mongoose.Schema(
     },
 
     price: {
-      type: Number,
+      type: String,
       trim: true,
     },
 
@@ -79,7 +79,7 @@ const subjectSchema = new mongoose.Schema(
     }, 
 
     duration: {
-      type: Number,
+      type: String,
       trim: true
     },
 

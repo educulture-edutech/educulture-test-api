@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
+    birthdate: {
+      type: String, 
+      required: true, 
+      trim: true,
+    },
+
     goalSelected: {
       // type: Array,
       // trim: true
