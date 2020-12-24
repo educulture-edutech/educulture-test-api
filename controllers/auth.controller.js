@@ -229,6 +229,44 @@ exports.loginUser = async(req, res) => {
   });
 }
 
+exports.resetPassword = async (req, res) => {
+  
+  const {mobile, newPassword} = req.body;
+
+  const encry_password = crypto
+    .createHmac("sha256", process.env.SECRET)
+    .update(newPassword)
+    .digest("hex");
+
+  try {
+    // update the user purchase list
+    const user = await User.findOneAndUpdate({_id: req.profile._id}, 
+      {$set: {password: encry_password} }, 
+      {new: true});
+
+    if(!user) {
+        return res.status(404).json({
+          responseDTO: {
+            error: "user not found"
+          }
+        })
+    }
+
+    else {
+        return res.status(200).json({
+          responseDTO: {
+            message: "success"
+          } 
+        })
+    }
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+
+}
+
 // auth middlewares
 
 exports.isSignIn = expressjwt({
