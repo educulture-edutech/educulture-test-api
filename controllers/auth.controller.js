@@ -44,7 +44,10 @@ exports.checkNumber = async (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, mobile, gender, birthdate } = req.body;
+  const { firstName, lastName, email, password, mobile, gender, birthdate } = req.body.registrationDTO;
+
+  console.log(req.body);
+  console.log(req.body.registrationDTO);
 
   const encry_password = crypto
     .createHmac("sha256", process.env.SECRET)
