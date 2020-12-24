@@ -44,10 +44,21 @@ exports.checkNumber = async (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { firstName, lastName, email, password, mobile, gender, birthdate } = req.body.registrationDTO;
 
   console.log(req.body);
-  console.log(req.body.registrationDTO);
+
+  const firstName = req.body.registrationDTO.firstName.toString();
+  const lastName = req.body.registrationDTO.lastName.toString();
+  const password = req.body.registrationDTO.password.toString();
+  const email = req.body.registrationDTO.email.toString();
+  const mobile = req.body.registrationDTO.mobile.toString();
+  const gender = req.body.registrationDTO.gender.toString();
+  const birthdate = req.body.registrationDTO.birthdate.toString();
+
+  // const {firstName, lastName, email, password, mobile, gender, birthdate} = req.body;
+
+  // console.log(req.body);
+  // console.log(req.body.registrationDTO);
 
   const encry_password = crypto
     .createHmac("sha256", process.env.SECRET)
@@ -64,6 +75,8 @@ exports.registerUser = async (req, res) => {
     birthdate: birthdate,
     isAccountRegistered: true, 
   });
+
+  console.log(user);
 
   user.save((err, user) => {
     if (err || !user) {
