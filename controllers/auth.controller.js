@@ -93,7 +93,6 @@ exports.registerUser = async (req, res) => {
     const {_id, firstName, lastName, email, mobile, birthdate, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
     return res.status(200).json({
-        responseDTO: {
           _id, 
           token, 
           firstName, 
@@ -107,8 +106,7 @@ exports.registerUser = async (req, res) => {
           isAccountRegistered, 
           isGoalSelected, 
           isAccountVerified, 
-          profileImage 
-        }
+          profileImage
     })
   });
 };
