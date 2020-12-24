@@ -103,12 +103,12 @@ const userSchema = new mongoose.Schema(
           },
 
           purchaseDate: {
-            type: Date, 
+            type: String, 
             trim: true, 
           }, 
 
           expiryDate: {
-            type: Date, 
+            type: String, 
             trim: true, 
           }, 
 

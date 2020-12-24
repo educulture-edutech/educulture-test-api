@@ -68,6 +68,14 @@ exports.getAllGoals = async (req, res) => {
     return res.status(200).json({responseDTO: arr});
 }
 
+exports.getUserAccount = async (req, res) => {
+
+    req.profile.password = undefined;
+    return res.status(200).json({
+        responseDTO: req.profile
+    })
+}
+
 
 // exports.getAllSubjects = async (req, res) => {
 //     const goalId = req.profile.goalSelected;

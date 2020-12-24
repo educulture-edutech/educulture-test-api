@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const { checkNumber, registerUser, sendOTP, verifyOTP, loginUser, isTokenExpired } = require("../controllers/auth.controller");
+const { route } = require("./user.routes");
 
 // check the mobile number is present in the database or not
 router.get("/account/check-number", checkNumber);
