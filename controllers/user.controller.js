@@ -17,8 +17,6 @@ exports.getUserById = async (req, res, next, id) => {
     })
 }
 
-
-
 // ========================= CONTROLLERS ================================
 
 exports.updateGoals = async(req, res) => {
@@ -69,6 +67,29 @@ exports.getUserAccount = async (req, res) => {
 
     req.profile.password = undefined;
     return res.status(200).json(req.profile);
+}
+
+exports.deleteAccount = async (req, res) => {
+
+    console.log("visited");
+
+    try {
+        const user = await User.deleteOne({_id: req.profile._id});
+        if(!user) {
+            return res.status(404).json({
+                error: "user not found in DB"
+            })
+        }
+
+        else {
+            return res.status(200).json({
+                message: "success"
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
 }
 
 
