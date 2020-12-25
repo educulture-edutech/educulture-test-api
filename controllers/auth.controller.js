@@ -199,7 +199,7 @@ exports.loginUser = async(req, res) => {
 
       if(user.password === encry_password) {
         // if password is correct generate token
-        let token = jwt.sign({_id: user._id}, process.env.SECRET);
+        const token = jwt.sign({_id: user._id}, process.env.SECRET);
 
         const {_id, firstName, lastName, email, mobile, birthdate, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
@@ -275,7 +275,7 @@ exports.intializeResetPassword = async (req, res) => {
 
     try {
       const user = await User.findOne({mobile: mobile});
-  
+   
       if(!user) {
         return res.status(404).json({
           error: "user not found in DB"
@@ -283,6 +283,9 @@ exports.intializeResetPassword = async (req, res) => {
       }
   
       else {
+
+        const userId = user._id;
+        const token = jwt.sign({_id: user._id}, process.env.SECRET);
 
         fetch(
           `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
@@ -296,6 +299,8 @@ exports.intializeResetPassword = async (req, res) => {
           .then((json) => {
             console.log(json);
             return res.status(200).json({
+              _id: userId,
+              token: token,
               message: json.request_id,
               type: json.type
             });
@@ -305,11 +310,7 @@ exports.intializeResetPassword = async (req, res) => {
       console.log(error);
       res.status(500).send(error);
     }
-
   }
-
-  
-
 }
 
 
