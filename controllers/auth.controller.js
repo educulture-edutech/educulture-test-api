@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const expressjwt = require("express-jwt");
 const fetch = require("node-fetch");
+const { join } = require("path");
 
 exports.checkNumber = async (req, res) => {
   
@@ -119,7 +120,10 @@ exports.sendOTP = async (req, res) => {
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
-        return res.status(200).json(json);
+        return res.status(200).json({
+          message: json.request_id,
+          type: json.type
+        });
       });
   }
 
