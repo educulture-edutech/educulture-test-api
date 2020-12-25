@@ -11,7 +11,8 @@ router.put("/user/update-goal/:userId", isSignIn, isAuthenticated, updateGoals);
 
 router.get("/user/get-goals", getAllGoals);
 
-router.get("/user/get-account/:userId", getUserAccount);
+router.get("/user/get-account/:userId", isSignIn, isAuthenticated, getUserAccount);
 
+// router.delete("/user/delete-account/:userId", isSignIn, isAuthenticated, deleteAccount);
 
 module.exports = router;
