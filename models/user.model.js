@@ -83,53 +83,29 @@ const userSchema = new mongoose.Schema(
       default: "https://raw.githubusercontent.com/educulture-edutech/icons/main/user.png"
     },
 
-    userPurchaseList: {
-      type: Array, 
-      default: [
-        {
-          subjectId: {
-            type: String, 
-            trim: true
-          },
+    userPurchaseList: Array, 
+      // default: [
+      //   {
+      //     subjectId: String,
 
-          subjectName: {
-            type: String, 
-            trim: true,
-          },
+      //     subjectName: String,
 
-          thumbnail: {
-            type: String, 
-            trim: true,
-          },
-          
-          isExpired: {
-            type: Boolean, 
-            trim: true,
-            default: false
-          },
+      //     thumbnail: String, 
 
-          purchaseDate: {
-            type: String, 
-            trim: true, 
-          }, 
+      //     isExpired: {
+      //       type: Boolean, 
+      //       default: false
+      //     },
 
-          expiryDate: {
-            type: String, 
-            trim: true, 
-          }, 
+      //     purchaseDate: String, 
 
-          duration: {
-            type: String, 
-            trim: true,
-          }, 
+      //     expiryDate: String,
 
-          referenceId: {
-            type: String, 
-            trim: true
-          }
-        }
-      ]
-    },
+      //     duration: String,
+
+      //     referenceId: String,
+      //   }
+      // ]
   },
 
   {
