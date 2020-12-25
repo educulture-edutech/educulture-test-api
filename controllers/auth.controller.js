@@ -3,7 +3,9 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const expressjwt = require("express-jwt");
 const fetch = require("node-fetch");
-const { join } = require("path");
+
+
+// ========================== CONTROLLERS ======================================
 
 exports.checkNumber = async (req, res) => {
   
@@ -261,7 +263,57 @@ exports.resetPassword = async (req, res) => {
 
 }
 
-// auth middlewares
+exports.intializeResetPassword = async (req, res) => {
+  // get mobile number as input
+  // find if mobile number is present in the DB
+  // if not error please signup
+  // if yes then mobile number is present in the DB send user data back to client and send otp
+
+  const mobile = req.query.mobile;
+
+  if(typeof(mobile) !=="undefined" && mobile.length == 10) {
+
+    try {
+      const user = await User.findOne({mobile: mobile});
+  
+      if(!user) {
+        return res.status(404).json({
+          error: "user not found in DB"
+        })
+      }
+  
+      else {
+
+        fetch(
+          `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
+          {
+            method: "GET",
+            port: null,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+          .then((res) => res.json())
+          .then((json) => {
+            console.log(json);
+            return res.status(200).json({
+              message: json.request_id,
+              type: json.type
+            });
+          });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+    }
+
+  }
+
+  
+
+}
+
+
+// ================================= MIDDLEWARES ================================================
 
 exports.isSignIn = expressjwt({
   secret: process.env.SECRET,

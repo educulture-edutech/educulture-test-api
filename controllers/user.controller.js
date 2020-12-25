@@ -1,7 +1,8 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
 
-// param function
+// ========================= PARAMS =====================================
+
 exports.getUserById = async (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if(err || !user) {
@@ -16,7 +17,10 @@ exports.getUserById = async (req, res, next, id) => {
     })
 }
 
-// controller functions
+
+
+// ========================= CONTROLLERS ================================
+
 exports.updateGoals = async(req, res) => {
     
     const goalId = req.body.goalId;  

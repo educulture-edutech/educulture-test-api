@@ -111,6 +111,43 @@ exports.getSubjectBySubjectId = async (req, res) => {
     }	
 }
 
+exports.getAdvertisements = async (req, res) => {
+	// this api will give data of all free subjects under the goalId
+	const goalId = req.query.goalId;
+
+	try {
+		const subjects = await Subject.find({goalId: goalId, free: true });
+
+		if(!subjects) {
+			return res.status(404).json({
+				error: "error in getting free subjects under this goalId"
+			});
+		}
+
+		else {
+			subjects.map((subject) => {
+				subject.subtopics = undefined;
+				subject.goalId = undefined;
+				subject.subjectDescription = undefined;
+				subject.instructor = undefined;
+				subject.instructorId = undefined;
+				subject.price = undefined;
+				subject.free = undefined;
+				subject.duration = undefined;
+				subject.createdAt = undefined;
+				subject.updatedAt = undefined;
+				subject.__v = undefined;
+			});
+
+			return res.status(200).json(subjects);
+
+		}
+	} catch (error) {
+		console.log(error);
+		res.status(500).send(error);
+	}
+}
+
 // sample stringify json data for creating new subject
 
 /*

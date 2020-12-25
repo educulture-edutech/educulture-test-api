@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const { checkNumber, registerUser, sendOTP, verifyOTP, loginUser, isTokenExpired, isSignIn, isAuthenticated, resetPassword } = require("../controllers/auth.controller");
+const { checkNumber, registerUser, sendOTP, verifyOTP, loginUser, isTokenExpired, isSignIn, isAuthenticated, resetPassword, intializeResetPassword } = require("../controllers/auth.controller");
 const { getUserById } = require("../controllers/user.controller");
 const { route } = require("./user.routes");
 
@@ -19,5 +19,7 @@ router.get("/account/verifyOTP/:userId", isSignIn, isAuthenticated, verifyOTP);
 router.post("/account/login", loginUser);
 
 router.put("/account/reset-password/:userId",isSignIn, isAuthenticated, resetPassword);
+
+router.get("/account/initialize-reset-password", intializeResetPassword);
 
 module.exports = router;
