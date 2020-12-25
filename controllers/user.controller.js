@@ -58,7 +58,7 @@ exports.getAllGoals = async (req, res) => {
         }
     ]
 
-    return res.status(200).json({responseDTO: arr});
+    return res.status(200).json(arr);
 }
 
 exports.getUserAccount = async (req, res) => {
