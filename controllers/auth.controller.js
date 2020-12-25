@@ -12,33 +12,27 @@ exports.checkNumber = async (req, res) => {
       // find the mobile number in DB
       User.findOne({ mobile }, (err, user) => {
         if (err || !user) {
-          return res.status(200).json({
-            responseDTO: {
+          return res.status(200).json({          
               mobile: mobile,
               isAccountRegistered: false, 
               isAccountVerified: false,
-              isGoalSelected: false,
-            }  
+              isGoalSelected: false,  
           });
         }
 
         // else mobile number is found
-        return res.status(200).json({
-          responseDTO: {
+        return res.status(200).json({    
             mobile: user.mobile,
             isAccountRegistered: user.isAccountRegistered,
             isAccountVerified: user.isAccountVerified,
-            isGoalSelected: user.isGoalSelected,
-          }
+            isGoalSelected: user.isGoalSelected,  
         });
       });
     }
 
     else {
-      return res.status(400).json({
-        responseDTO: {
-          error: "enter valid mobile number"
-        }
+      return res.status(400).json({       
+          error: "enter valid mobile number" 
       });
     }
 };
@@ -80,10 +74,8 @@ exports.registerUser = async (req, res) => {
 
   user.save((err, user) => {
     if (err || !user) {
-      return res.status(400).json({
-        responseDTO: {
+      return res.status(400).json({     
           error: "error in saving information in DB",
-        }
       });
     }
 
@@ -107,7 +99,7 @@ exports.registerUser = async (req, res) => {
           isGoalSelected, 
           isAccountVerified, 
           profileImage
-    })
+      });
   });
 };
 
@@ -127,17 +119,13 @@ exports.sendOTP = async (req, res) => {
       .then((res) => res.json())
       .then((json) => {
         console.log(json);
-        return res.status(200).json({
-          responseDTO: json
-        });
+        return res.status(200).json(json);
       });
   }
 
   else {
-    return res.status(400).json({
-      responseDTO: {
+    return res.status(400).json({     
         error: "enter valid mobile number"
-      }
     });
   }
 };
@@ -169,22 +157,18 @@ exports.verifyOTP = async(req, res) => {
         .exec((err, user) => {
           if(err || !user) {
             return res.status(404).json({
-              responseDTO: {
-                error: "error in updating isAccountVerified flag"
-              }
+                error: "error in updating isAccountVerified flag"        
             })    
           }
           
-          return res.status(200).json({responseDTO: json});
+          return res.status(200).json( json);
         }); 
       });
   }
   
   else {
     return res.status(400).json({
-      responseDTO: {
-        error: "enter valid otp and mobile number"
-      }
+        error: "enter valid otp and mobile number" 
     });
   }
 }
@@ -214,7 +198,6 @@ exports.loginUser = async(req, res) => {
         const {_id, firstName, lastName, email, mobile, birthdate, goalSelected, role, gender, isAccountRegistered, isGoalSelected, isAccountVerified, profileImage } = user;
 
         return res.status(200).json({
-          responseDTO: {
             _id, 
             token, 
             firstName, 
@@ -229,15 +212,12 @@ exports.loginUser = async(req, res) => {
             isGoalSelected, 
             isAccountVerified, 
             profileImage 
-          }
         })
       }
 
       else {
         return res.status(401).json({
-          responseDTO: {
             error: "password does not match with mobile number."
-          }
         })
       }
   });
@@ -260,17 +240,13 @@ exports.resetPassword = async (req, res) => {
 
     if(!user) {
         return res.status(404).json({
-          responseDTO: {
             error: "user not found"
-          }
         })
     }
 
     else {
-        return res.status(200).json({
-          responseDTO: {
+        return res.status(200).json({ 
             message: "success"
-          } 
         })
     }
     
@@ -294,9 +270,7 @@ exports.isAuthenticated = (req, res, next) => {
   
   if(!checker) {
     return res.status(403).json({
-      responseDTO: {
         error: "access denied."
-      }
     })
   }
 
@@ -306,9 +280,7 @@ exports.isAuthenticated = (req, res, next) => {
 exports.isAdmin = (req, res, next) => {
   if (req.profile.role === 0) {
     return res.status(403).json({
-      responseDTO: {
         error: "not admin. access denied.",
-      }
     });
   }
   next();

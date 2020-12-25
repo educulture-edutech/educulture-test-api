@@ -5,12 +5,9 @@ const Subject = require("../models/subject.model");
 exports.getUserById = async (req, res, next, id) => {
     User.findById(id).exec((err, user) => {
         if(err || !user) {
-            return res.status(404).json({
-                responseDTO: {
-                    error: "user not found"
-                }
-                
-            })
+            return res.status(404).json({              
+                    error: "user not found"               
+            });
         }
 
         // user found
@@ -28,7 +25,7 @@ exports.updateGoals = async(req, res) => {
         if(err || !user) {
             return res.status(404).json({
                 error: "user not found"
-            })
+            });
         }
 
         // update the array in the database
@@ -39,18 +36,14 @@ exports.updateGoals = async(req, res) => {
         )
         .exec((err, user) => {
             if(err || !user) {
-                return res.status(400).json({
-                    responseDTO: {
-                        error: "error in updating goals list"
-                    }
-                })
+                return res.status(400).json({    
+                    error: "error in updating goals list"
+                });
             }
     
             return res.status(200).json({
-                responseDTO: {
                     message: "success",
                     goalSelected: user.goalSelected
-                }
             });
         })
     })
@@ -71,9 +64,7 @@ exports.getAllGoals = async (req, res) => {
 exports.getUserAccount = async (req, res) => {
 
     req.profile.password = undefined;
-    return res.status(200).json({
-        responseDTO: req.profile
-    })
+    return res.status(200).json(req.profile);
 }
 
 
