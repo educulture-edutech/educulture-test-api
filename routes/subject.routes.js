@@ -13,6 +13,6 @@ router.get("/subject/all-subjects/:userId", isSignIn, isAuthenticated, getAllSub
 
 router.get("/subject/get-subject/:userId", isSignIn, isAuthenticated, getSubjectBySubjectId);
 
-router.get("/subject/get-advertisement", isSignIn, isAuthenticated, getAdvertisements);
+router.get("/subject/get-advertisement/:userId", isSignIn, isAuthenticated, getAdvertisements);
 
 module.exports = router;

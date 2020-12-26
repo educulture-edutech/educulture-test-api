@@ -42,6 +42,8 @@ exports.updateGoals = async(req, res) => {
                     error: "error in updating goals list"
                 });
             }
+
+            console.log(user.goalSelected);
     
             return res.status(200).json({
                     message: "success",

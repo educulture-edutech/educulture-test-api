@@ -58,7 +58,7 @@ exports.getAllSubjects = async (req, res) => {
 	// }
 
 	try {
-		const subjects = await Subject.find({goalId: goalId});
+		const subjects = await Subject.find({goalId: goalId, free: false});
 		if(!subjects) {
 			return res.status(404).json({
                 error: "no subject found for goal selected by user"
@@ -72,7 +72,7 @@ exports.getAllSubjects = async (req, res) => {
 				subject.instructor = undefined;
 				subject.instructorId = undefined;
 				subject.price = undefined;
-				subject.free = undefined;
+				// subject.free = undefined;
 				subject.duration = undefined;
 				subject.createdAt = undefined;
 				subject.updatedAt = undefined;
@@ -113,7 +113,7 @@ exports.getSubjectBySubjectId = async (req, res) => {
 
 exports.getAdvertisements = async (req, res) => {
 	// this api will give data of all free subjects under the goalId
-	const goalId = req.query.goalId;
+	const goalId = req.profile.goalSelected;
 
 	try {
 		const subjects = await Subject.find({goalId: goalId, free: true });
@@ -132,7 +132,7 @@ exports.getAdvertisements = async (req, res) => {
 				subject.instructor = undefined;
 				subject.instructorId = undefined;
 				subject.price = undefined;
-				subject.free = undefined;
+				// subject.free = undefined;
 				subject.duration = undefined;
 				subject.createdAt = undefined;
 				subject.updatedAt = undefined;
