@@ -69,7 +69,7 @@ exports.getAllSubjects = async (req, res) => {
 				subject.subtopics = undefined;
 				subject.goalId = undefined;
 				subject.subjectDescription = undefined;
-				subject.instructor = undefined;
+				// subject.instructor = undefined;
 				subject.instructorId = undefined;
 				subject.price = undefined;
 				// subject.free = undefined;
@@ -129,7 +129,7 @@ exports.getAdvertisements = async (req, res) => {
 				subject.subtopics = undefined;
 				subject.goalId = undefined;
 				subject.subjectDescription = undefined;
-				subject.instructor = undefined;
+				// subject.instructor = undefined;
 				subject.instructorId = undefined;
 				subject.price = undefined;
 				// subject.free = undefined;
