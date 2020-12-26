@@ -45,7 +45,7 @@ exports.updateGoals = async(req, res) => {
     
             return res.status(200).json({
                     message: "success",
-                    goalSelected: user.goalSelected
+                    type: user.goalSelected // goalSelected: user.goalSelected
             });
         })
     })
