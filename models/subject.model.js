@@ -59,7 +59,8 @@ const subjectSchema = new mongoose.Schema(
             default: [
               {
                 chapterName: String,
-                chapterId: String, 
+                chapterId: String,
+                thumbnail: String, 
                 url: String
               }
             ]

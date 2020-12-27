@@ -66,9 +66,12 @@ exports.getAllGoals = async (req, res) => {
 }
 
 exports.getUserAccount = async (req, res) => {
-
     req.profile.password = undefined;
     return res.status(200).json(req.profile);
+}
+
+exports.getUserPurchaseList = async (req, res) => {
+    return res.status(200).json(req.profile.userPurchaseList);
 }
 
 exports.deleteAccount = async (req, res) => {
