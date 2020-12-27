@@ -10,18 +10,16 @@ const helmet = require("helmet");
 // ===================== DATABASE CONNECTION =======================================
 
 mongoose
-.connect(process.env.DATABASE, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-})
-.then(() => {
-  console.log("DB CONNECTED");
-})
-.catch((err) => console.log("error in DB connection", err));
-
-
+  .connect(process.env.DATABASE, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then(() => {
+    console.log("DB CONNECTED");
+  })
+  .catch((err) => console.log("error in DB connection", err));
 
 //Middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
