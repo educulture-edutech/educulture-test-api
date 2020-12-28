@@ -105,7 +105,7 @@ exports.paymentSuccess = async (req, res) => {
       purchaseDate: purchaseDate.format(),
       expiryDate: expiryDate.format(),
       duration: req.subject.duration,
-      orderId: orderId,
+      orderId: req.body.razorpay_order_id,
     };
   } else {
     return res.status(400).json({
