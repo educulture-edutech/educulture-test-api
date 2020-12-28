@@ -2,75 +2,124 @@ const Payment = require("../models/payments.model");
 const User = require("../models/user.model");
 const dayjs = require("dayjs");
 const { nanoid } = require("nanoid");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+
+// ===================== RAZORPAY INITIALIZATION =====================================
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_ID,
+  key_secret: process.env.RAZORPAY_SECRET,
+});
 
 exports.createReceipt = async (req, res) => {
-  const { paymentType } = req.body;
+  const { price } = req.body;
 
   // create random referenceId for receipt
   const referenceId = await nanoid(10);
   console.log(referenceId);
 
-  // initiate payment receipt and save into payment model
+  // razorpay
+  const options = {
+    amount: Number(price) * 100,
+    currency: "INR",
+    receipt: referenceId,
+    // payment_capture: "1",
+  };
+
   try {
-    const payment = new Payment({
-      user: req.profile._id,
-      subject: req.subject._id,
-      paymentType: paymentType,
-      referenceId: referenceId,
-      subjectPrice: req.subject.price,
-      cgst: 0,
-      sgst: 0,
-      totalAmount: (
-        Number(req.subject.price) +
-        Number(0) +
-        Number(0)
-      ).toString(),
-      paymentStatus: "initiated",
-    });
+    const order = await razorpay.orders.create(options);
 
-    let savedPaymentReceipt = await payment.save();
-
-    if (!savedPaymentReceipt) {
+    if (!order) {
       return res.status(400).json({
-        error: "error creating new payment receipt",
+        error: "error in creating receipt at server",
       });
     } else {
-      return res.status(200).json(savedPaymentReceipt);
+      console.log(order);
+      try {
+        const payment = new Payment({
+          user: req.profile._id,
+          subject: req.subject._id,
+          // paymentType: paymentType,
+          orderId: order.id,
+          referenceId: referenceId,
+          subjectPrice: (order.amount / 100).toString(),
+          cgst: "0",
+          sgst: "0",
+          totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
+          paymentStatus: order.status,
+        });
+
+        let savedPaymentReceipt = await payment.save();
+
+        if (!savedPaymentReceipt) {
+          return res.status(400).json({
+            error: "error creating new payment receipt",
+          });
+        } else {
+          return res.status(200).json(savedPaymentReceipt);
+        }
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+          error: error,
+        });
+      }
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).send(error);
+    return res.status(500).json({
+      error: error,
+    });
   }
 };
 
 exports.paymentSuccess = async (req, res) => {
-  const { paymentId, transactionId, paymentType, referenceId } = req.body;
+  const razorpay_order_id = req.body.razorpay_order_id;
+  const razorpay_payment_id = req.body.razorpay_payment_id;
+  const razorpay_signature = req.body.razorpay_signature;
+  const referenceId = req.body.referenceId;
 
-  const purchaseDate = dayjs();
-  const expiryDate = purchaseDate.add(Number(req.subject.duration), "month");
+  const generate_signature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_SECRET)
+    .update(razorpay_order_id + "|" + razorpay_payment_id)
+    .digest("hex");
 
-  // initiate purchase object to push in userPurchaseList
-  const purchase = {
-    subjectName: req.subject.subjectName,
-    subjectId: req.subject.subjectId,
-    instructor: req.subject.instructor,
-    instructorId: req.subject.instructorId,
-    thumbnail: req.subject.thumbnail,
-    isExpired: false,
-    purchaseDate: purchaseDate.format(),
-    expiryDate: expiryDate.format(),
-    duration: req.subject.duration,
-    referenceId: referenceId,
-  };
+  console.log("generate signature : ", generate_signature);
+  console.log("razorpay signature", razorpay_signature);
+
+  if (generate_signature === razorpay_signature) {
+    console.log("payment verified.");
+
+    // store everything in database
+    const purchaseDate = dayjs();
+    const expiryDate = purchaseDate.add(Number(req.subject.duration), "month");
+    // initiate purchase object to push in userPurchaseList
+    const purchase = {
+      subjectName: req.subject.subjectName,
+      subjectId: req.subject.subjectId,
+      instructor: req.subject.instructor,
+      instructorId: req.subject.instructorId,
+      thumbnail: req.subject.thumbnail,
+      isExpired: false,
+      purchaseDate: purchaseDate.format(),
+      expiryDate: expiryDate.format(),
+      duration: req.subject.duration,
+      orderId: orderId,
+    };
+  } else {
+    return res.status(400).json({
+      error: "error in payment verification.",
+    });
+  }
 
   // find the payment document by referenceId and update it
   try {
     let payment = await Payment.findOneAndUpdate(
-      { referenceId: referenceId, paymentType: paymentType },
+      { referenceId: referenceId },
       {
         $set: {
-          paymentId: paymentId,
-          transactionId: transactionId,
+          paymentId: razorpay_payment_id,
           paymentStatus: "success",
         },
       },
@@ -78,8 +127,8 @@ exports.paymentSuccess = async (req, res) => {
     );
 
     if (!payment) {
-      return res.status(400).json({
-        error: "no referenceId and paymentType is matched in db",
+      return res.status(404).json({
+        error: "no orderId is matched in db",
       });
     } else {
       // push purchase object inside the userPurchaseList
