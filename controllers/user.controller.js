@@ -4,99 +4,104 @@ const Subject = require("../models/subject.model");
 // ========================= PARAMS =====================================
 
 exports.getUserById = async (req, res, next, id) => {
-    User.findById(id).exec((err, user) => {
-        if(err || !user) {
-            return res.status(404).json({              
-                    error: "user not found"               
-            });
-        }
+  User.findById(id).exec((err, user) => {
+    if (err || !user) {
+      return res.status(404).json({
+        error: "user not found",
+      });
+    }
 
-        // user found
-        req.profile = user;
-        next();
-    })
-}
+    // user found
+    req.profile = user;
+    next();
+  });
+};
 
 // ========================= CONTROLLERS ================================
 
-exports.updateGoals = async(req, res) => {
-    
-    const goalId = req.body.goalId;  
+exports.updateGoals = async (req, res) => {
+  const goalId = req.body.goalId;
 
-    User.findById(req.profile._id).exec((err, user) => {
-        if(err || !user) {
-            return res.status(404).json({
-                error: "user not found"
-            });
-        }
+  User.findById(req.profile._id).exec((err, user) => {
+    if (err || !user) {
+      return res.status(404).json({
+        error: "user not found",
+      });
+    }
 
-        // update the array in the database
-        User.findOneAndUpdate(
-            { _id: req.profile._id},
-            { $set: {goalSelected: goalId, isGoalSelected: true }},
-            { new: true}
-        )
-        .exec((err, user) => {
-            if(err || !user) {
-                return res.status(400).json({    
-                    error: "error in updating goals list"
-                });
-            }
+    // update the array in the database
+    User.findOneAndUpdate(
+      { _id: req.profile._id },
+      { $set: { goalSelected: goalId, isGoalSelected: true } },
+      { new: true }
+    ).exec((err, user) => {
+      if (err || !user) {
+        return res.status(400).json({
+          error: "error in updating goals list",
+        });
+      }
 
-            console.log(user.goalSelected);
-    
-            return res.status(200).json({
-                    message: "success",
-                    type: user.goalSelected // goalSelected: user.goalSelected
-            });
-        })
-    })
-}
+      console.log(user.goalSelected);
+
+      return res.status(200).json({
+        message: "success",
+        type: user.goalSelected, // goalSelected: user.goalSelected
+      });
+    });
+  });
+};
 
 exports.getAllGoals = async (req, res) => {
+  const arr = [
+    {
+      goalId: "1001",
+      goalName: "MPSC",
+    },
+  ];
 
-    const arr = [
-        {
-            goalId: "1001", 
-            goalName: "MPSC"  
-        }
-    ]
-
-    return res.status(200).json(arr);
-}
+  return res.status(200).json(arr);
+};
 
 exports.getUserAccount = async (req, res) => {
+  if (req.profile) {
     req.profile.password = undefined;
     return res.status(200).json(req.profile);
-}
+  } else {
+    return res.status(404).json({
+      error: "user not found.",
+    });
+  }
+};
 
 exports.getUserPurchaseList = async (req, res) => {
+  if (req.profile) {
     return res.status(200).json(req.profile.userPurchaseList);
-}
+  } else {
+    return res.status(404).json({
+      error: "user not found.",
+    });
+  }
+};
 
 exports.deleteAccount = async (req, res) => {
+  console.log("visited");
 
-    console.log("visited");
-
-    try {
-        const user = await User.deleteOne({_id: req.profile._id});
-        if(!user) {
-            return res.status(404).json({
-                error: "user not found in DB"
-            })
-        }
-
-        else {
-            return res.status(200).json({
-                message: "success"
-            })
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json(error);
+  try {
+    const user = await User.deleteOne({ _id: req.profile._id });
+    if (!user) {
+      return res.status(404).json({
+        error: "user not found in DB",
+      });
+    } else {
+      return res.status(200).json({
+        message: "success",
+      });
     }
-}
-
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+  }
+};
 
 // exports.getAllSubjects = async (req, res) => {
 //     const goalId = req.profile.goalSelected;
@@ -113,7 +118,7 @@ exports.deleteAccount = async (req, res) => {
 // }
 
 // exports.updateGoals = async(req, res) => {
-//     const {goalArray} = req.body;  
+//     const {goalArray} = req.body;
 
 //     if(goalArray.length <= 0) {
 //         return res.status(400).json({
@@ -128,7 +133,7 @@ exports.deleteAccount = async (req, res) => {
 //                     error: "user not found"
 //                 })
 //             }
-    
+
 //             // update the array in the database
 //             User.findOneAndUpdate(
 //                 { _id: req.profile._id},
@@ -141,13 +146,13 @@ exports.deleteAccount = async (req, res) => {
 //                         error: "error in updating goals list"
 //                     })
 //                 }
-        
+
 //                 return res.status(200).json({
 //                     message: "success",
 //                     goalArray: user.goalSelected
 //                 });
 //             })
-    
+
 //         })
 //     }
 // }
