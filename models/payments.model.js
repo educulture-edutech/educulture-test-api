@@ -3,10 +3,14 @@ const { ObjectId } = mongoose.Schema;
 
 const paymentSchema = new mongoose.Schema(
   {
+    // used
+
     user: {
       type: ObjectId,
       ref: "User",
     },
+
+    // used
 
     subject: {
       type: ObjectId,
@@ -14,15 +18,21 @@ const paymentSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // used
+
     paymentType: {
       type: String,
       trim: true,
     },
 
+    // used
+
     orderId: {
       type: String,
       trim: true,
     },
+
+    // used
 
     referenceId: {
       type: String,
@@ -30,11 +40,6 @@ const paymentSchema = new mongoose.Schema(
     },
 
     paymentId: {
-      type: String,
-      trim: true,
-    },
-
-    transactionId: {
       type: String,
       trim: true,
     },
