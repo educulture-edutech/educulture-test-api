@@ -107,56 +107,56 @@ exports.paymentSuccess = async (req, res) => {
       duration: req.subject.duration,
       orderId: req.body.razorpay_order_id,
     };
+
+    // find the payment document by referenceId and update it
+    try {
+      let payment = await Payment.findOneAndUpdate(
+        { referenceId: referenceId },
+        {
+          $set: {
+            paymentId: razorpay_payment_id,
+            paymentStatus: "success",
+          },
+        },
+        { new: true }
+      );
+
+      if (!payment) {
+        return res.status(404).json({
+          error: "no orderId is matched in db",
+        });
+      } else {
+        // push purchase object inside the userPurchaseList
+        try {
+          // update the user purchase list
+          const user = await User.findOneAndUpdate(
+            { _id: req.profile._id },
+            { $push: { userPurchaseList: purchase } },
+            { new: true }
+          );
+
+          if (!user) {
+            return res.status(500).json({
+              message: "error",
+            });
+          } else {
+            return res.status(200).json({
+              message: "success",
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          return res.status(500).send(error);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
   } else {
     return res.status(400).json({
       error: "error in payment verification.",
     });
-  }
-
-  // find the payment document by referenceId and update it
-  try {
-    let payment = await Payment.findOneAndUpdate(
-      { referenceId: referenceId },
-      {
-        $set: {
-          paymentId: razorpay_payment_id,
-          paymentStatus: "success",
-        },
-      },
-      { new: true }
-    );
-
-    if (!payment) {
-      return res.status(404).json({
-        error: "no orderId is matched in db",
-      });
-    } else {
-      // push purchase object inside the userPurchaseList
-      try {
-        // update the user purchase list
-        const user = await User.findOneAndUpdate(
-          { _id: req.profile._id },
-          { $push: { userPurchaseList: purchase } },
-          { new: true }
-        );
-
-        if (!user) {
-          return res.status(500).json({
-            message: "error",
-          });
-        } else {
-          return res.status(200).json({
-            message: "success",
-          });
-        }
-      } catch (error) {
-        console.log(error);
-        return res.status(500).send(error);
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
   }
 };
 
