@@ -1,6 +1,5 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
-const dayjs = require("dayjs");
 
 // param function
 exports.getSubjectById = async (req, res, next, id) => {
@@ -86,74 +85,23 @@ exports.getAllSubjects = async (req, res) => {
 exports.getSubjectBySubjectId = async (req, res) => {
   const subjectId = req.query.subjectId;
 
-  const flag = 0;
-  const userPurchaseList = req.profile.userPurchaseList;
-
-  console.log("userPurchaseList ->", userPurchaseList);
-  console.log("userPurchaseList length ->", userPurchaseList.length);
-
-  if (userPurchaseList.length >= 1) {
-    userPurchaseList.map((subject, index) => {
-      if (subject.subjectId === subjectId) {
-        if (subject.isExpired == true) {
-          return res.status(403).json({
-            error: "subject validity expired.",
-          });
-        }
-
-        const currentDate = dayjs();
-        const expiryDate = dayjs(subject.expiryDate);
-
-        if (currentDate.isBefore(dayjs(expiryDate)) === false) {
-          // subscription is invalid
-          flag = 1;
-          subject.isExpired = true;
-        }
-      }
+  try {
+    const subject = await Subject.findOne({
+      subjectId: subjectId,
     });
 
-    if (flag !== 0) {
-      // means something is changed, set the new purchaseList
-      const user = await User.findOneAndUpdate(
-        { _id: req.profile._id },
-        { $set: { userPurchaseList: userPurchaseList } },
-        { new: true }
-      );
-
-      if (!user) {
-        console.log("user not found in db");
-        return res.status(500).json({
-          error: "error in updating the userPurchaseList",
-        });
-      } else {
-        console.log("userPurchaseList updated -> subject validity expired");
-        return res.status(403).json({
-          error: "subject validity expired",
-        });
-      }
+    if (!subject) {
+      return res.status(404).json({
+        error: "no subject found for this id",
+      });
     } else {
-      try {
-        const subject = await Subject.findOne({
-          subjectId: subjectId,
-        });
-
-        if (!subject) {
-          return res.status(404).json({
-            error: "no subject found for this subjectId",
-          });
-        } else {
-          return res.status(200).json(subject);
-        }
-      } catch (error) {
-        // exception, maybe db is broken when query data
-        console.log(error);
-        return res.status(500).send(error);
-      }
+      return res.status(200).json(subject);
     }
-  } else
-    return res.status(404).json({
-      error: "userPurchaseList is empty.",
-    });
+  } catch (error) {
+    // exception, maybe db is broken when query data
+    console.log(error);
+    return res.status(500).send(error);
+  }
 };
 
 exports.getAdvertisements = async (req, res) => {
@@ -252,13 +200,3 @@ exports.getAdvertisements = async (req, res) => {
 }
 
 */
-
-// check if expiry date has crossed or not
-
-// const purchaseDate = dayjs();
-
-// console.log(purchaseDate.format().toString());
-
-// const expiryDate = purchaseDate.add(12, 'month');
-
-// console.log(expiryDate.format().toString());
