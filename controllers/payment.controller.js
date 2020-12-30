@@ -8,8 +8,8 @@ const crypto = require("crypto");
 // ===================== RAZORPAY INITIALIZATION =====================================
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_ID,
-  key_secret: process.env.RAZORPAY_SECRET,
+  key_id: process.env.RAZORPAY_LIVE_ID,
+  key_secret: process.env.RAZORPAY_LIVE_SECRET,
 });
 
 exports.createReceipt = async (req, res) => {
