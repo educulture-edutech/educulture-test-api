@@ -1,152 +1,188 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
+const dayjs = require("dayjs");
 
 // param function
 exports.getSubjectById = async (req, res, next, id) => {
-    Subject.findById(id).exec((err, subject) => {
-        if(err || !subject) {
-            return res.status(404).json({
-                error: "subject not found for this id"
-            })
-        }
+  Subject.findById(id).exec((err, subject) => {
+    if (err || !subject) {
+      return res.status(404).json({
+        error: "subject not found for this id",
+      });
+    }
 
-        // user found
-        req.subject = subject;
-        next();
-    })
-}
+    // user found
+    req.subject = subject;
+    next();
+  });
+};
 
-exports.createSubject = async(req, res) => {
-    
-    const subject = new Subject(req.body);
+exports.createSubject = async (req, res) => {
+  const subject = new Subject(req.body);
 
-	try {
-		let savedSubject = await subject.save();
-		if(!savedSubject) {
-			return res.status(400).json({
-                error: "error creating new subject"
-            })
-		}
-		else {
-			return res.status(200).json(savedSubject);
-		}
-
-	} catch (error) {
-		console.log(error);
-		return res.status(500).send(error);
-	}
-}
+  try {
+    let savedSubject = await subject.save();
+    if (!savedSubject) {
+      return res.status(400).json({
+        error: "error creating new subject",
+      });
+    } else {
+      return res.status(200).json(savedSubject);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
 
 exports.getAllSubjects = async (req, res) => {
-    
-	const goalId = req.profile.goalSelected;
+  const goalId = req.profile.goalSelected;
 
-	// try {
-	// 	const subjects = await Subject.find({goalId: goalId});
-	// 	if(!subjects) {
-	// 		return res.status(404).json({
-    //             error: "no subject found for goal selected by user"
-    //         })
-	// 	}
+  // try {
+  // 	const subjects = await Subject.find({goalId: goalId});
+  // 	if(!subjects) {
+  // 		return res.status(404).json({
+  //             error: "no subject found for goal selected by user"
+  //         })
+  // 	}
 
-	// 	else {
-	// 		return res.status(200).json(subjects);
-	// 	}
-	// } catch (error) {
-	// 	console.log(error);
-	// 	return res.status(500).send(error)
-	// }
+  // 	else {
+  // 		return res.status(200).json(subjects);
+  // 	}
+  // } catch (error) {
+  // 	console.log(error);
+  // 	return res.status(500).send(error)
+  // }
 
-	try {
-		const subjects = await Subject.find({goalId: goalId, free: false});
-		if(!subjects) {
-			return res.status(404).json({
-                error: "no subject found for goal selected by user"
-            });
-		}
-		else {
-			subjects.map((subject) => {
-				subject.subtopics = undefined;
-				subject.goalId = undefined;
-				subject.subjectDescription = undefined;
-				// subject.instructor = undefined;
-				subject.instructorId = undefined;
-				subject.price = undefined;
-				// subject.free = undefined;
-				subject.duration = undefined;
-				subject.createdAt = undefined;
-				subject.updatedAt = undefined;
-				subject.__v = undefined;
-			});
+  try {
+    const subjects = await Subject.find({ goalId: goalId, free: false });
+    if (!subjects) {
+      return res.status(404).json({
+        error: "no subject found for goal selected by user",
+      });
+    } else {
+      subjects.map((subject) => {
+        subject.subtopics = undefined;
+        subject.goalId = undefined;
+        subject.subjectDescription = undefined;
+        // subject.instructor = undefined;
+        subject.instructorId = undefined;
+        subject.price = undefined;
+        // subject.free = undefined;
+        subject.duration = undefined;
+        subject.createdAt = undefined;
+        subject.updatedAt = undefined;
+        subject.__v = undefined;
+      });
 
-			return res.status(200).json(subjects);
-
-		}
-	} catch (error) {
-		console.log(error);
-		return res.status(500).send(error);
-	}
-}
+      return res.status(200).json(subjects);
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
 
 exports.getSubjectBySubjectId = async (req, res) => {
-	
-	const subjectId = req.query.subjectId;
+  const subjectId = req.query.subjectId;
 
-	try {
-        const subject = await Subject.findOne({
-            subjectId: subjectId
+  const flag = 0;
+  const userPurchaseList = req.profile.userPurchaseList;
+
+  console.log("userPurchaseList ->", userPurchaseList);
+
+  userPurchaseList.map((subject, index) => {
+    if (subject.subjectId === subjectId) {
+      if (subject.isExpired == true) {
+        return res.status(403).json({
+          error: "subject validity expired.",
         });
+      }
 
-        if (!subject) {
-            return res.status(404).json({
-                error: "no subject found for this id"
-            })
-        } else {
-            return res.status(200).json(subject);
-        }
+      const currentDate = dayjs();
+      const expiryDate = dayjs(subject.expiryDate);
+
+      if (currentDate.isBefore(dayjs(expiryDate)) === false) {
+        // subscription is invalid
+        flag = 1;
+        subject.isExpired = true;
+      }
+    }
+  });
+
+  if (flag !== 0) {
+    // means something is changed, set the new purchaseList
+    const user = await User.findOneAndUpdate(
+      { _id: req.profile._id },
+      { $set: { userPurchaseList: userPurchaseList } },
+      { new: true }
+    );
+
+    if (!user) {
+      console.log("user not found in db");
+      return res.status(500).json({
+        error: "error in updating the userPurchaseList",
+      });
+    } else {
+      console.log("userPurchaseList updated -> subject validity expired");
+      return res.status(403).json({
+        error: "subject validity expired",
+      });
+    }
+  } else {
+    try {
+      const subject = await Subject.findOne({
+        subjectId: subjectId,
+      });
+
+      if (!subject) {
+        return res.status(404).json({
+          error: "no subject found for this subjectId",
+        });
+      } else {
+        return res.status(200).json(subject);
+      }
     } catch (error) {
-        // exception, maybe db is broken when query data
-        console.log(error);
-        return res.status(500).send(error)
-    }	
-}
+      // exception, maybe db is broken when query data
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  }
+};
 
 exports.getAdvertisements = async (req, res) => {
-	// this api will give data of all free subjects under the goalId
-	const goalId = req.profile.goalSelected;
+  // this api will give data of all free subjects under the goalId
+  const goalId = req.profile.goalSelected;
 
-	try {
-		const subjects = await Subject.find({goalId: goalId, free: true });
+  try {
+    const subjects = await Subject.find({ goalId: goalId, free: true });
 
-		if(!subjects) {
-			return res.status(404).json({
-				error: "error in getting free subjects under this goalId"
-			});
-		}
+    if (!subjects) {
+      return res.status(404).json({
+        error: "error in getting free subjects under this goalId",
+      });
+    } else {
+      subjects.map((subject) => {
+        subject.subtopics = undefined;
+        subject.goalId = undefined;
+        subject.subjectDescription = undefined;
+        // subject.instructor = undefined;
+        subject.instructorId = undefined;
+        subject.price = undefined;
+        // subject.free = undefined;
+        subject.duration = undefined;
+        subject.createdAt = undefined;
+        subject.updatedAt = undefined;
+        subject.__v = undefined;
+      });
 
-		else {
-			subjects.map((subject) => {
-				subject.subtopics = undefined;
-				subject.goalId = undefined;
-				subject.subjectDescription = undefined;
-				// subject.instructor = undefined;
-				subject.instructorId = undefined;
-				subject.price = undefined;
-				// subject.free = undefined;
-				subject.duration = undefined;
-				subject.createdAt = undefined;
-				subject.updatedAt = undefined;
-				subject.__v = undefined;
-			});
-
-			return res.status(200).json(subjects);
-
-		}
-	} catch (error) {
-		console.log(error);
-		res.status(500).send(error);
-	}
-}
+      return res.status(200).json(subjects);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+};
 
 // sample stringify json data for creating new subject
 
@@ -210,3 +246,13 @@ exports.getAdvertisements = async (req, res) => {
 }
 
 */
+
+// check if expiry date has crossed or not
+
+// const purchaseDate = dayjs();
+
+// console.log(purchaseDate.format().toString());
+
+// const expiryDate = purchaseDate.add(12, 'month');
+
+// console.log(expiryDate.format().toString());

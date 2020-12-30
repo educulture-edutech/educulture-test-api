@@ -103,6 +103,25 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
+exports.clearUserPurchaseList = async (req, res) => {
+  const userPurchaseList = [];
+  const userId = req.body.userId;
+
+  const user = await User.findOneAndUpdate(
+    { _id: userId },
+    { $set: { userPurchaseList: userPurchaseList } },
+    { new: true }
+  );
+
+  if (!user) {
+    return res.status(404).json({
+      error: "user not found",
+    });
+  } else {
+    return res.status(200).json(user);
+  }
+};
+
 // exports.getAllSubjects = async (req, res) => {
 //     const goalId = req.profile.goalSelected;
 

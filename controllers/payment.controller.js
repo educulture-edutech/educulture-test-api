@@ -12,6 +12,8 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_LIVE_SECRET,
 });
 
+// ===================== CONTROLLERS =================================================
+
 exports.createReceipt = async (req, res) => {
   const { price } = req.body;
 
@@ -95,7 +97,7 @@ exports.paymentSuccess = async (req, res) => {
 
     // store everything in database
     const purchaseDate = dayjs();
-    const expiryDate = purchaseDate.add(Number(req.subject.duration), "month");
+    const expiryDate = purchaseDate.add(Number(req.subject.duration), "minute");
     // initiate purchase object to push in userPurchaseList
     const purchase = {
       subjectName: req.subject.subjectName,
