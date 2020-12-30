@@ -31,11 +31,12 @@ exports.createReceipt = async (req, res) => {
     const order = await razorpay.orders.create(options);
 
     if (!order) {
+      console.log("error in creating receipt at server");
       return res.status(400).json({
         error: "error in creating receipt at server",
       });
     } else {
-      console.log(order);
+      console.log("orderObj created by razorpay API: ", order);
       try {
         const payment = new Payment({
           user: req.profile._id,
@@ -57,6 +58,7 @@ exports.createReceipt = async (req, res) => {
             error: "error creating new payment receipt",
           });
         } else {
+          console.log("receipt created successfully.");
           return res.status(200).json(savedPaymentReceipt);
         }
       } catch (error) {
@@ -81,7 +83,7 @@ exports.paymentSuccess = async (req, res) => {
   const referenceId = req.body.referenceId;
 
   const generate_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_SECRET)
+    .createHmac("sha256", process.env.RAZORPAY_LIVE_SECRET)
     .update(razorpay_order_id + "|" + razorpay_payment_id)
     .digest("hex");
 
@@ -89,7 +91,7 @@ exports.paymentSuccess = async (req, res) => {
   console.log("razorpay signature", razorpay_signature);
 
   if (generate_signature === razorpay_signature) {
-    console.log("payment verified.");
+    console.log("signatures matched -> payment verified.");
 
     // store everything in database
     const purchaseDate = dayjs();
@@ -122,6 +124,7 @@ exports.paymentSuccess = async (req, res) => {
       );
 
       if (!payment) {
+        console.log("no orderId is matched in database");
         return res.status(404).json({
           error: "no orderId is matched in db",
         });
@@ -136,10 +139,14 @@ exports.paymentSuccess = async (req, res) => {
           );
 
           if (!user) {
+            console.log("user not found in db");
             return res.status(500).json({
               message: "error",
             });
           } else {
+            console.log(
+              "payment verified -> course added in account -> success."
+            );
             return res.status(200).json({
               message: "success",
             });
