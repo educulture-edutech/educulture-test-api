@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
-
+const dayjs = require("dayjs");
 // param function
 exports.getSubjectById = async (req, res, next, id) => {
   Subject.findById(id).exec((err, subject) => {
@@ -83,24 +83,59 @@ exports.getAllSubjects = async (req, res) => {
 };
 
 exports.getSubjectData = async (req, res) => {
-  const subjectId = req.query.subjectId;
+  const { subjectId, expiryDate } = req.body;
 
-  try {
-    const subject = await Subject.findOne({
-      subjectId: subjectId,
+  const currentDate = dayjs();
+
+  if (currentDate.isAfter(dayjs(expiryDate))) {
+    // currentDate crossed expiry date
+
+    // get userPurchaseList
+    const userPurchaseList = req.profile.userPurchaseList;
+
+    // find the subject in userPurchaseList
+    userPurchaseList.map((subject, index) => {
+      if (subject.subjectId == subjectId) {
+        // update the isExpired flag
+        subject.isExpired = true;
+      }
     });
 
-    if (!subject) {
+    // update the status in userPurchaseList
+    const user = User.findOneAndUpdate(
+      { _id: req.profile._id },
+      { $set: { userPurchaseList: userPurchaseList } },
+      { new: true }
+    );
+
+    if (!user) {
       return res.status(404).json({
-        error: "no subject found for this id",
+        error: "user not found to update userPurchaseList",
       });
     } else {
-      return res.status(200).json(subject);
+      // user found, userPurchaseList updated.
+      return res.status(400).json({
+        error: "subject validity is expired",
+      });
     }
-  } catch (error) {
-    // exception, maybe db is broken when query data
-    console.log(error);
-    return res.status(500).send(error);
+  } else {
+    try {
+      const subject = await Subject.findOne({
+        subjectId: subjectId,
+      });
+
+      if (!subject) {
+        return res.status(404).json({
+          error: "no subject found for this id",
+        });
+      } else {
+        return res.status(200).json(subject);
+      }
+    } catch (error) {
+      // exception, maybe db is broken when query data
+      console.log(error);
+      return res.status(500).send(error);
+    }
   }
 };
 
