@@ -82,7 +82,7 @@ exports.getAllSubjects = async (req, res) => {
   }
 };
 
-exports.getSubjectBySubjectId = async (req, res) => {
+exports.getSubjectData = async (req, res) => {
   const subjectId = req.query.subjectId;
 
   try {
