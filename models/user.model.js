@@ -36,15 +36,15 @@ const userSchema = new mongoose.Schema(
     },
 
     birthdate: {
-      type: String, 
-      required: true, 
+      type: String,
+      required: true,
       trim: true,
     },
 
     goalSelected: {
       // type: Array,
       // trim: true
-      type: String, 
+      type: String,
       trim: true,
     },
 
@@ -61,51 +61,35 @@ const userSchema = new mongoose.Schema(
     },
 
     isAccountRegistered: {
-      type: Boolean, 
+      type: Boolean,
       default: false,
       trim: true,
     },
 
     isAccountVerified: {
       type: Boolean,
-      default: false, 
+      default: false,
       trim: true,
     },
 
     isGoalSelected: {
-      type: Boolean, 
-      default: false
+      type: Boolean,
+      default: false,
     },
 
     profileImage: {
-      type: String, 
-      trim: true, 
-      default: "https://raw.githubusercontent.com/educulture-edutech/icons/main/user.png"
+      type: String,
+      trim: true,
+      default:
+        "https://raw.githubusercontent.com/educulture-edutech/icons/main/user.png",
     },
 
-    userPurchaseList: Array, 
-      // default: [
-      //   {
-      //     subjectId: String,
+    userPurchaseList: Array,
 
-      //     subjectName: String,
-
-      //     thumbnail: String, 
-
-      //     isExpired: {
-      //       type: Boolean, 
-      //       default: false
-      //     },
-
-      //     purchaseDate: String, 
-
-      //     expiryDate: String,
-
-      //     duration: String,
-
-      //     referenceId: String,
-      //   }
-      // ]
+    referralCode: {
+      type: String,
+      trim: true,
+    },
   },
 
   {

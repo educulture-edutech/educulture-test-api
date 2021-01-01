@@ -122,6 +122,8 @@ exports.clearUserPurchaseList = async (req, res) => {
   }
 };
 
+// =========================================== END ====================================================
+
 // exports.getAllSubjects = async (req, res) => {
 //     const goalId = req.profile.goalSelected;
 
