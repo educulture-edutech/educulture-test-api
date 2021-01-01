@@ -100,11 +100,13 @@ exports.paymentSuccess = async (req, res) => {
     const expiryDate = purchaseDate.add(Number(req.subject.duration), "minute");
     // initiate purchase object to push in userPurchaseList
     const purchase = {
+      subject_id: req.subject._id,
       subjectName: req.subject.subjectName,
       subjectId: req.subject.subjectId,
       instructor: req.subject.instructor,
       instructorId: req.subject.instructorId,
       thumbnail: req.subject.thumbnail,
+      free: req.subject.free,
       isExpired: false,
       purchaseDate: purchaseDate.format(),
       expiryDate: expiryDate.format(),
@@ -166,6 +168,43 @@ exports.paymentSuccess = async (req, res) => {
     return res.status(400).json({
       error: "error in payment verification.",
     });
+  }
+};
+
+exports.subscribeFreeSubject = async (req, res) => {
+  const purchase = {
+    subject_id: req.subject._id,
+    subjectName: req.subject.subjectName,
+    subjectId: req.subject.subjectId,
+    instructor: req.subject.instructor,
+    instructorId: req.subject.instructorId,
+    thumbnail: req.subject.thumbnail,
+    free: req.subject.free,
+  };
+
+  // add this free subject in the userPurchaseList
+  try {
+    // update the user purchase list
+    const user = await User.findOneAndUpdate(
+      { _id: req.profile._id },
+      { $push: { userPurchaseList: purchase } },
+      { new: true }
+    );
+
+    if (!user) {
+      console.log("user not found in db");
+      return res.status(500).json({
+        message: "error",
+      });
+    } else {
+      console.log("payment verified -> course added in account -> success.");
+      return res.status(200).json({
+        message: "success",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
   }
 };
 
