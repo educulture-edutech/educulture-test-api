@@ -105,7 +105,7 @@ exports.paymentSuccess = async (req, res) => {
       subjectId: req.subject.subjectId,
       instructor: req.subject.instructor,
       instructorId: req.subject.instructorId,
-      thumbnail: req.subject.thumbnail,
+      subjectThumbnail: req.subject.thumbnail,
       free: req.subject.free,
       isExpired: false,
       purchaseDate: purchaseDate.format(),
@@ -179,7 +179,7 @@ exports.subscribeFreeSubject = async (req, res) => {
       subjectId: req.subject.subjectId,
       instructor: req.subject.instructor,
       instructorId: req.subject.instructorId,
-      thumbnail: req.subject.thumbnail,
+      subjectThumbnail: req.subject.thumbnail,
       free: req.subject.free,
     };
 
@@ -226,4 +226,4 @@ exports.subscribeFreeSubject = async (req, res) => {
 
 // const datediff = date1.diff(purchaseDate, 'month');
 
-// console.log(datediff)
+// console.log(datediff

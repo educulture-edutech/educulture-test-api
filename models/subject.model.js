@@ -23,8 +23,8 @@ const subjectSchema = new mongoose.Schema(
     },
 
     subjectDescription: {
-      type: String, 
-      trim: true
+      type: String,
+      trim: true,
     },
 
     instructor: {
@@ -45,14 +45,14 @@ const subjectSchema = new mongoose.Schema(
       default: [
         {
           subtopicName: {
-            type: String, 
-            trim: true, 
-            required: true
+            type: String,
+            trim: true,
+            required: true,
           },
           subtopicId: {
-            type: String, 
-            trim: true, 
-            required: true
+            type: String,
+            trim: true,
+            required: true,
           },
           chapters: {
             type: Array,
@@ -60,13 +60,13 @@ const subjectSchema = new mongoose.Schema(
               {
                 chapterName: String,
                 chapterId: String,
-                thumbnail: String, 
-                url: String
-              }
-            ]
-          }
-        }
-      ]
+                chapterThumbnail: String,
+                url: String,
+              },
+            ],
+          },
+        },
+      ],
     },
 
     price: {
@@ -75,20 +75,21 @@ const subjectSchema = new mongoose.Schema(
     },
 
     free: {
-      type: Boolean, 
-      trim: true
-    }, 
+      type: Boolean,
+      trim: true,
+    },
 
     duration: {
       type: String,
-      trim: true
+      trim: true,
     },
 
-    thumbnail: {
-      type: String, 
+    subjectThumbnail: {
+      type: String,
       trim: true,
-      default: "https://raw.githubusercontent.com/educulture-edutech/icons/main/default-subject-image.png"
-    }
+      default:
+        "https://raw.githubusercontent.com/educulture-edutech/icons/main/default-subject-image.png",
+    },
   },
   { timestamps: true }
 );
