@@ -28,7 +28,7 @@ exports.updateGoals = async (req, res) => {
       { $set: { goalSelected: null, isGoalSelected: false } },
       { new: true }
     ).exec((error, user) => {
-      if (err || !user) {
+      if (error || !user) {
         return res.status(400).json({
           error: "error in updating goals list",
         });

@@ -32,7 +32,7 @@ router.get(
 );
 
 router.get(
-  "/subject/get-subject/:userId",
+  "/subject/get-subject/:userId/:subjectId",
   isSignIn,
   isAuthenticated,
   getSubjectData
