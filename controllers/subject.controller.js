@@ -167,8 +167,8 @@ exports.getSubjectData = async (req, res) => {
                   } else {
                     let chapters = subtopics[i].chapters;
                     for (let j = 1; j < chapters.length; j++) {
-                      chapters[i].chapterId = undefined;
-                      chapters.url = undefined;
+                      chapters[j].chapterId = undefined;
+                      chapters[j].url = undefined;
                     }
                   }
                 }
@@ -227,8 +227,8 @@ exports.getSubjectData = async (req, res) => {
             } else {
               let chapters = subtopics[i].chapters;
               for (let j = 1; j < chapters.length; j++) {
-                chapters[i].chapterId = undefined;
-                chapters.url = undefined;
+                chapters[j].chapterId = undefined;
+                chapters[j].url = undefined;
               }
             }
           }
