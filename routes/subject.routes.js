@@ -11,10 +11,13 @@ const {
   getAllSubjects,
   getAdvertisements,
   getSubjectData,
+  getSubjectById,
 } = require("../controllers/subject.controller");
 
 // params
 router.param("userId", getUserById);
+
+router.param("subjectId", getSubjectById);
 
 router.post(
   "/subject/create-subject/:userId",

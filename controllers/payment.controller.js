@@ -172,39 +172,41 @@ exports.paymentSuccess = async (req, res) => {
 };
 
 exports.subscribeFreeSubject = async (req, res) => {
-  const purchase = {
-    subject_id: req.subject._id,
-    subjectName: req.subject.subjectName,
-    subjectId: req.subject.subjectId,
-    instructor: req.subject.instructor,
-    instructorId: req.subject.instructorId,
-    thumbnail: req.subject.thumbnail,
-    free: req.subject.free,
-  };
+  if (req.subject.free == true) {
+    const purchase = {
+      subject_id: req.subject._id,
+      subjectName: req.subject.subjectName,
+      subjectId: req.subject.subjectId,
+      instructor: req.subject.instructor,
+      instructorId: req.subject.instructorId,
+      thumbnail: req.subject.thumbnail,
+      free: req.subject.free,
+    };
 
-  // add this free subject in the userPurchaseList
-  try {
-    // update the user purchase list
-    const user = await User.findOneAndUpdate(
-      { _id: req.profile._id },
-      { $push: { userPurchaseList: purchase } },
-      { new: true }
-    );
+    // add this free subject in the userPurchaseList
+    try {
+      // update the user purchase list
+      const user = await User.findOneAndUpdate(
+        { _id: req.profile._id },
+        { $push: { userPurchaseList: purchase } },
+        { new: true }
+      );
 
-    if (!user) {
-      console.log("user not found in db");
-      return res.status(500).json({
-        message: "error",
-      });
-    } else {
-      console.log("payment verified -> course added in account -> success.");
-      return res.status(200).json({
-        message: "success",
-      });
+      if (!user) {
+        console.log("user not found in db");
+        return res.status(404).json({
+          error: "user not found in DB",
+        });
+      } else {
+        console.log("free subject added in userPurchaseList");
+        return res.status(200).json({
+          message: "success",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
     }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
   }
 };
 

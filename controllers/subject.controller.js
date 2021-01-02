@@ -105,91 +105,9 @@ exports.getSubjectData = async (req, res) => {
   else {
     // check if subject data is in user purchase list
     const userPurchaseList = req.profile.userPurchaseList;
-    for (let i = 0; i < userPurchaseList.length; i++) {
-      if (userPurchaseList[i].subject_id == req.subject._id) {
-        const currentDate = dayjs();
-        if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
-          userPurchaseList[i].isExpired = true;
-          flag = 1;
-          break;
-        }
-        //
-        else {
-          // expiry date is not crossed. return subject data
-          try {
-            const subject = await Subject.findOne({
-              _id: userPurchaseList[i].subject_id,
-            });
-            if (!subject) {
-              return res.status(404).json({
-                error: "subject not found in the database",
-              });
-            } else {
-              return res.status(200).json(subject);
-            }
-          } catch (error) {
-            console.log(error);
-            return res.status(500).send(error);
-          }
-        }
-      }
-      //
-      else {
-        // subject is not in userPurchaseList ERR 403 only expose first chapter
-        try {
-          // subject validity expired ERR 403 only expose two first chapter
-          const subject = await Subject.findOne({
-            _id: req.subject._id,
-          });
-          if (!subject) {
-            return res.status(404).json({
-              error: "subject not found in the database",
-            });
-          } else {
-            let subtopics = req.subject.subtopics;
-            for (let i = 0; i < subtopics.length; i++) {
-              if (i !== 0) {
-                let chapters = subtopics[i].chapters;
-                for (let j = 0; j < chapters.length; j++) {
-                  chapters[j].chapterId = undefined;
-                  chapters[j].url = undefined;
-                }
-              } else {
-                let chapters = subtopics[i].chapters;
-                for (let j = 1; j < chapters.length; j++) {
-                  chapters[j].chapterId = undefined;
-                  chapters[j].url = undefined;
-                }
-              }
-            }
-
-            // return this unexposed subject
-            return res.status(200).json(subject);
-          }
-        } catch (error) {
-          console.log(error);
-          return res.status(500).send(error);
-        }
-      }
-    }
-  }
-
-  if (flag !== 0) {
-    // something is changed in userPurchaseList
-    // so update the userPurchaseList
-
-    const user = await User.findOneAndUpdate(
-      { _id: req.profile._id },
-      { $set: { userPurchaseList: userPurchaseList } },
-      { new: true }
-    );
-
-    if (!user) {
-      return res.status(500).json({
-        error: "userPurchaseList is not updated.",
-      });
-    } else {
-      // still returns the subject data
+    console.log(userPurchaseList);
+    if (userPurchaseList.length <= 0) {
+      console.log("userPurchaseList is empty");
       try {
         // subject validity expired ERR 403 only expose two first chapter
         const subject = await Subject.findOne({
@@ -200,29 +118,163 @@ exports.getSubjectData = async (req, res) => {
             error: "subject not found in the database",
           });
         } else {
-          let subtopics = req.subject.subtopics;
+          let newSubjectDTO = subject;
+          let subtopics = newSubjectDTO.subtopics;
+
           for (let i = 0; i < subtopics.length; i++) {
             if (i !== 0) {
               let chapters = subtopics[i].chapters;
+
               for (let j = 0; j < chapters.length; j++) {
-                chapters[j].chapterId = undefined;
-                chapters[j].url = undefined;
+                chapters[j].chapterId = null;
+                chapters[j].url = null;
               }
+              // console.log(chapters);
             } else {
               let chapters = subtopics[i].chapters;
               for (let j = 1; j < chapters.length; j++) {
-                chapters[j].chapterId = undefined;
-                chapters[j].url = undefined;
+                chapters[j].chapterId = null;
+                chapters[j].url = null;
               }
             }
           }
 
           // return this unexposed subject
-          return res.status(200).json(subject);
+          return res.status(200).json(newSubjectDTO);
         }
       } catch (error) {
         console.log(error);
         return res.status(500).send(error);
+      }
+    } else {
+      console.log("checking if subject is in userPurchaseList");
+      for (let i = 0; i < userPurchaseList.length; i++) {
+        if (userPurchaseList[i].subject_id == req.subject._id) {
+          const currentDate = dayjs();
+          if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
+            userPurchaseList[i].isExpired = true;
+            flag = 1;
+            break;
+          }
+          //
+          else {
+            // expiry date is not crossed. return subject data
+            try {
+              const subject = await Subject.findOne({
+                _id: userPurchaseList[i].subject_id,
+              });
+              if (!subject) {
+                return res.status(404).json({
+                  error: "subject not found in the database",
+                });
+              } else {
+                return res.status(200).json(subject);
+              }
+            } catch (error) {
+              console.log(error);
+              return res.status(500).send(error);
+            }
+          }
+        }
+        //
+        else {
+          // subject is not in userPurchaseList ERR 403 only expose first chapter
+          try {
+            // subject validity expired ERR 403 only expose two first chapter
+            const subject = await Subject.findOne({
+              _id: req.subject._id,
+            });
+            if (!subject) {
+              return res.status(404).json({
+                error: "subject not found in the database",
+              });
+            } else {
+              let newSubjectDTO = subject;
+              let subtopics = newSubjectDTO.subtopics;
+
+              for (let i = 0; i < subtopics.length; i++) {
+                if (i !== 0) {
+                  let chapters = subtopics[i].chapters;
+
+                  for (let j = 0; j < chapters.length; j++) {
+                    chapters[j].chapterId = null;
+                    chapters[j].url = null;
+                  }
+                  // console.log(chapters);
+                } else {
+                  let chapters = subtopics[i].chapters;
+                  for (let j = 1; j < chapters.length; j++) {
+                    chapters[j].chapterId = null;
+                    chapters[j].url = null;
+                  }
+                }
+              }
+
+              // return this unexposed subject
+              return res.status(200).json(newSubjectDTO);
+            }
+          } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+          }
+        }
+      }
+
+      if (flag !== 0) {
+        // something is changed in userPurchaseList
+        // so update the userPurchaseList
+
+        const user = await User.findOneAndUpdate(
+          { _id: req.profile._id },
+          { $set: { userPurchaseList: userPurchaseList } },
+          { new: true }
+        );
+
+        if (!user) {
+          return res.status(500).json({
+            error: "userPurchaseList is not updated.",
+          });
+        } else {
+          // still returns the subject data
+          try {
+            // subject validity expired ERR 403 only expose two first chapter
+            const subject = await Subject.findOne({
+              _id: req.subject._id,
+            });
+            if (!subject) {
+              return res.status(404).json({
+                error: "subject not found in the database",
+              });
+            } else {
+              let newSubjectDTO = subject;
+              let subtopics = newSubjectDTO.subtopics;
+
+              for (let i = 0; i < subtopics.length; i++) {
+                if (i !== 0) {
+                  let chapters = subtopics[i].chapters;
+
+                  for (let j = 0; j < chapters.length; j++) {
+                    chapters[j].chapterId = null;
+                    chapters[j].url = null;
+                  }
+                  // console.log(chapters);
+                } else {
+                  let chapters = subtopics[i].chapters;
+                  for (let j = 1; j < chapters.length; j++) {
+                    chapters[j].chapterId = null;
+                    chapters[j].url = null;
+                  }
+                }
+              }
+
+              // return this unexposed subject
+              return res.status(200).json(newSubjectDTO);
+            }
+          } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+          }
+        }
       }
     }
   }
