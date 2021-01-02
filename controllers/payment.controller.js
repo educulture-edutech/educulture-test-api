@@ -17,6 +17,8 @@ const razorpay = new Razorpay({
 exports.createReceipt = async (req, res) => {
   const { price } = req.body;
 
+  console.log("price: ", price);
+
   // create random referenceId for receipt
   const referenceId = await nanoid(10);
   console.log(referenceId);
