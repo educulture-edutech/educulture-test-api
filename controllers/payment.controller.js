@@ -4,12 +4,38 @@ const dayjs = require("dayjs");
 const { nanoid } = require("nanoid");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const redis = require("redis");
+const client = redis.createClient({
+  port: 6379,
+  host: "127.0.0.1",
+});
 
 // ===================== RAZORPAY INITIALIZATION =====================================
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID,
   key_secret: process.env.RAZORPAY_SECRET,
+});
+
+// ===================== REDIS =======================================================
+client.on("connect", () => {
+  console.log("connected to redis");
+});
+
+client.on("error", (error) => {
+  console.log(error);
+});
+
+client.on("ready", () => {
+  console.log("client is connected to redis");
+});
+
+client.on("end", () => {
+  console.log("client disconnected from redis");
+});
+
+process.on("SIGINT", () => {
+  client.quit();
 });
 
 // ===================== CONTROLLERS =================================================
@@ -42,6 +68,21 @@ exports.createReceipt = async (req, res) => {
     } else {
       console.log("orderObj created by razorpay API: ", order);
       try {
+        // additional code
+        const paymentObj = {
+          user: req.profile._id,
+          subject: req.subject._id,
+          // paymentType: paymentType,
+          orderId: order.id,
+          referenceId: referenceId,
+          subjectPrice: (order.amount / 100).toString(),
+          cgst: "0",
+          sgst: "0",
+          totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
+          paymentStatus: order.status,
+        };
+        client.set(req.profile._id, JSON.stringify(paymentObj));
+        // additional code ends here
         const payment = new Payment({
           user: req.profile._id,
           subject: req.subject._id,
@@ -214,6 +255,8 @@ exports.subscribeFreeSubject = async (req, res) => {
     }
   }
 };
+
+exports.createReceipt2 = async (req, res) => {};
 
 // const dayjs = require("dayjs");
 
