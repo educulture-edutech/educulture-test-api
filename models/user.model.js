@@ -85,11 +85,6 @@ const userSchema = new mongoose.Schema(
     },
 
     userPurchaseList: Array,
-
-    referralCode: {
-      type: String,
-      trim: true,
-    },
   },
 
   {

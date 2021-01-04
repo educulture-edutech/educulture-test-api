@@ -85,6 +85,7 @@ exports.paymentSuccess = async (req, res) => {
   const razorpay_payment_id = req.body.razorpay_payment_id;
   const razorpay_signature = req.body.razorpay_signature;
   const referenceId = req.body.referenceId;
+  const referralCode = req.body.referralCode;
 
   const generate_signature = crypto
     .createHmac("sha256", process.env.RAZORPAY_LIVE_SECRET)
@@ -114,6 +115,7 @@ exports.paymentSuccess = async (req, res) => {
       expiryDate: expiryDate.format(),
       duration: req.subject.duration,
       orderId: req.body.razorpay_order_id,
+      referralCode: req.body.referralCode,
     };
 
     // find the payment document by referenceId and update it

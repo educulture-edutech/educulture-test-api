@@ -68,6 +68,11 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: "uninitiated",
     },
+
+    referralCode: {
+      type: String,
+      trim: true,
+    },
   },
 
   {

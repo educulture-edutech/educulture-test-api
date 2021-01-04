@@ -46,7 +46,6 @@ exports.registerUser = async (req, res) => {
   const mobile = req.body.mobile.toString();
   const gender = req.body.gender.toString();
   const birthdate = req.body.birthdate.toString();
-  const referralCode = req.body.referralCode.toString();
 
   // const {firstName, lastName, email, password, mobile, gender, birthdate} = req.body;
 
@@ -67,7 +66,6 @@ exports.registerUser = async (req, res) => {
     gender: gender,
     birthdate: birthdate,
     isAccountRegistered: true,
-    referralCode: referralCode,
   });
 
   console.log(user);
