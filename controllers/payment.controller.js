@@ -18,25 +18,25 @@ const razorpay = new Razorpay({
 });
 
 // ===================== REDIS =======================================================
-client.on("connect", () => {
-  console.log("connected to redis");
-});
+// client.on("connect", () => {
+//   console.log("connected to redis");
+// });
 
-client.on("error", (error) => {
-  console.log(error);
-});
+// client.on("error", (error) => {
+//   console.log(error);
+// });
 
-client.on("ready", () => {
-  console.log("client is connected to redis");
-});
+// client.on("ready", () => {
+//   console.log("client is connected to redis");
+// });
 
-client.on("end", () => {
-  console.log("client disconnected from redis");
-});
+// client.on("end", () => {
+//   console.log("client disconnected from redis");
+// });
 
-process.on("SIGINT", () => {
-  client.quit();
-});
+// process.on("SIGINT", () => {
+//   client.quit();
+// });
 
 // ===================== CONTROLLERS =================================================
 
@@ -68,21 +68,21 @@ exports.createReceipt = async (req, res) => {
     } else {
       console.log("orderObj created by razorpay API: ", order);
       try {
-        // additional code
-        const paymentObj = {
-          user: req.profile._id,
-          subject: req.subject._id,
-          // paymentType: paymentType,
-          orderId: order.id,
-          referenceId: referenceId,
-          subjectPrice: (order.amount / 100).toString(),
-          cgst: "0",
-          sgst: "0",
-          totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
-          paymentStatus: order.status,
-        };
-        client.set(req.profile._id, JSON.stringify(paymentObj));
-        // additional code ends here
+        // // additional code
+        // const paymentObj = {
+        //   user: req.profile._id,
+        //   subject: req.subject._id,
+        //   // paymentType: paymentType,
+        //   orderId: order.id,
+        //   referenceId: referenceId,
+        //   subjectPrice: (order.amount / 100).toString(),
+        //   cgst: "0",
+        //   sgst: "0",
+        //   totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
+        //   paymentStatus: order.status,
+        // };
+        // client.set(req.profile._id, JSON.stringify(paymentObj));
+        // // additional code ends here
         const payment = new Payment({
           user: req.profile._id,
           subject: req.subject._id,
