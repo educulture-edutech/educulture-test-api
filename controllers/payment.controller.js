@@ -81,7 +81,7 @@ exports.createReceipt = async (req, res) => {
         //   totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
         //   paymentStatus: order.status,
         // };
-        // client.set(req.profile._id, JSON.stringify(paymentObj));
+        // client.set((req.profile._id).toString(), JSON.stringify(paymentObj));
         // // additional code ends here
         const payment = new Payment({
           user: req.profile._id,
@@ -129,7 +129,7 @@ exports.paymentSuccess = async (req, res) => {
   const referralCode = req.body.referralCode;
 
   const generate_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_LIVE_SECRET)
+    .createHmac("sha256", process.env.RAZORPAY_SECRET)
     .update(razorpay_order_id + "|" + razorpay_payment_id)
     .digest("hex");
 
@@ -225,7 +225,7 @@ exports.subscribeFreeSubject = async (req, res) => {
       subjectId: req.subject.subjectId,
       instructor: req.subject.instructor,
       instructorId: req.subject.instructorId,
-      subjectThumbnail: req.subject.thumbnail,
+      subjectThumbnail: req.subject.subjectThumbnail,
       free: req.subject.free,
     };
 
@@ -255,8 +255,6 @@ exports.subscribeFreeSubject = async (req, res) => {
     }
   }
 };
-
-exports.createReceipt2 = async (req, res) => {};
 
 // const dayjs = require("dayjs");
 
