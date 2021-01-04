@@ -108,7 +108,7 @@ exports.paymentSuccess = async (req, res) => {
       subjectId: req.subject.subjectId,
       instructor: req.subject.instructor,
       instructorId: req.subject.instructorId,
-      subjectThumbnail: req.subject.thumbnail,
+      subjectThumbnail: req.subject.subjectThumbnail,
       free: req.subject.free,
       isExpired: false,
       purchaseDate: purchaseDate.format(),
@@ -126,6 +126,7 @@ exports.paymentSuccess = async (req, res) => {
           $set: {
             paymentId: razorpay_payment_id,
             paymentStatus: "success",
+            referralCode: referralCode,
           },
         },
         { new: true }
