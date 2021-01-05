@@ -150,7 +150,7 @@ exports.getSubjectData = async (req, res) => {
     } else {
       console.log("checking if subject is in userPurchaseList");
       console.log("subject_id", userPurchaseList[0].subject_id);
-      console.log.("_id", req.subject._id);
+      console.log("_id", req.subject._id);
       for (let i = 0; i < userPurchaseList.length; i++) {
         if (
           userPurchaseList[i].subject_id.toString() ===
