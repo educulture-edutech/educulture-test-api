@@ -84,6 +84,7 @@ exports.getAllSubjects = async (req, res) => {
 
 exports.getSubjectData = async (req, res) => {
   const flag = 0;
+  const userPurchaseList = req.profile.userPurchaseList;
   // check if requested subject is free
   if (req.subject.free == true) {
     try {
@@ -104,7 +105,7 @@ exports.getSubjectData = async (req, res) => {
   // subject is paid
   else {
     // check if subject data is in user purchase list
-    const userPurchaseList = req.profile.userPurchaseList;
+
     console.log(userPurchaseList);
     if (userPurchaseList.length <= 0) {
       console.log("userPurchaseList is empty");
@@ -148,8 +149,10 @@ exports.getSubjectData = async (req, res) => {
       }
     } else {
       console.log("checking if subject is in userPurchaseList");
+      console.log("subject_id", userPurchaseList[0].subject_id);
       for (let i = 0; i < userPurchaseList.length; i++) {
         if (userPurchaseList[i].subject_id == req.subject._id) {
+          console.log("entered");
           const currentDate = dayjs();
           if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
             userPurchaseList[i].isExpired = true;
