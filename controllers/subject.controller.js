@@ -151,7 +151,10 @@ exports.getSubjectData = async (req, res) => {
       console.log("checking if subject is in userPurchaseList");
       console.log("subject_id", userPurchaseList[0].subject_id);
       for (let i = 0; i < userPurchaseList.length; i++) {
-        if (userPurchaseList[i].subject_id == req.subject._id) {
+        if (
+          userPurchaseList[i].subject_id.toString() ===
+          req.subject._id.toString()
+        ) {
           console.log("entered");
           const currentDate = dayjs();
           if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
