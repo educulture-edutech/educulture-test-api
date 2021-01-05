@@ -221,6 +221,12 @@ exports.verifyReferralCode = async (req, res) => {
 
   const referralCodeArray = ["NIRAVDA", "EDCLTR"];
 
+  if (typeof clientReferralCode === "undefined") {
+    return res.status(200).json({
+      message: "not applicable",
+    });
+  }
+
   let flag = 0;
 
   for (let i = 0; i < referralCodeArray.length; i++) {
