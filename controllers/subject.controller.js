@@ -168,6 +168,7 @@ exports.getSubjectData = async (req, res) => {
                   error: "subject not found in the database",
                 });
               } else {
+                console.log("SUBJECT FOUND: ".subject);
                 return res.status(200).json(subject);
               }
             } catch (error) {

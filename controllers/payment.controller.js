@@ -5,10 +5,6 @@ const { nanoid } = require("nanoid");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const redis = require("redis");
-const client = redis.createClient({
-  port: 6379,
-  host: "127.0.0.1",
-});
 
 // ===================== RAZORPAY INITIALIZATION =====================================
 
