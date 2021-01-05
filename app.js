@@ -21,34 +21,35 @@ mongoose
   })
   .catch((err) => console.log("error in DB connection", err));
 
-//Middlewares
+// ===================== MIDDLEWARES ================================================
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(compression());
 app.use(helmet());
 
-// Routes
+// ====================== ROUTES IMPORTS ====================================================
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const subjectRoutes = require("./routes/subject.routes");
 const paymentRoutes = require("./routes/payment.routes");
 
-// Use Routes
+// ====================== USE ROUTES =========================================================
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
 app.use("/api", subjectRoutes);
 app.use("/api", paymentRoutes);
 
-// sample test route
+// ======================= SAMPLE TESTING ROUTE =============================================
 app.get("/my-app", (req, res) => {
   res.send("hello.. tour app is running..");
 });
 
-//PORT
+// ======================= PORT DECLARATION =================================================
 const port = process.env.PORT || 3000;
 
-//Starting a server
+// ======================= LISTEN ON PORT ===================================================
 app.listen(port, () => {
   console.log(`app is running at ${port}`);
 });

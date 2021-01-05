@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+// ============================= IMPORTS ==========================================
+
 const {
   checkNumber,
   registerUser,
@@ -14,7 +16,7 @@ const {
 } = require("../controllers/auth.controller");
 const { getUserById } = require("../controllers/user.controller");
 
-// params
+// ============================== PARAMS ===========================================
 router.param("userId", getUserById);
 
 // check the mobile number is present in the database or not

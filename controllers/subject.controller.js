@@ -1,7 +1,9 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
 const dayjs = require("dayjs");
-// param function
+
+// ================ PARAM FUNCTIONS ===================================
+
 exports.getSubjectById = async (req, res, next, id) => {
   Subject.findById(id).exec((err, subject) => {
     if (err || !subject) {
@@ -15,6 +17,8 @@ exports.getSubjectById = async (req, res, next, id) => {
     next();
   });
 };
+
+// ================= CONTROLLERS ======================================
 
 exports.createSubject = async (req, res) => {
   const subject = new Subject(req.body);
@@ -36,22 +40,6 @@ exports.createSubject = async (req, res) => {
 
 exports.getAllSubjects = async (req, res) => {
   const goalId = req.profile.goalSelected;
-
-  // try {
-  // 	const subjects = await Subject.find({goalId: goalId});
-  // 	if(!subjects) {
-  // 		return res.status(404).json({
-  //             error: "no subject found for goal selected by user"
-  //         })
-  // 	}
-
-  // 	else {
-  // 		return res.status(200).json(subjects);
-  // 	}
-  // } catch (error) {
-  // 	console.log(error);
-  // 	return res.status(500).send(error)
-  // }
 
   try {
     const subjects = await Subject.find({ goalId: goalId, free: false });

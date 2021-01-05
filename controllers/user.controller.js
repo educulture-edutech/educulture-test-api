@@ -1,7 +1,7 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
 
-// ========================= PARAMS =====================================
+// ========================= PARAM FUNCTIONS =====================================
 
 exports.getUserById = async (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
@@ -17,7 +17,7 @@ exports.getUserById = async (req, res, next, id) => {
   });
 };
 
-// ========================= CONTROLLERS ================================
+// ========================= CONTROLLERS ==========================================
 
 exports.updateGoals = async (req, res) => {
   const goalId = req.body.goalId;

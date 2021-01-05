@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+// ===================== IMPORTS ======================================================
+
 const { getUserById } = require("../controllers/user.controller");
 const {
   createReceipt,
@@ -10,8 +12,12 @@ const {
 const { getSubjectById } = require("../controllers/subject.controller");
 const { isSignIn, isAuthenticated } = require("../controllers/auth.controller");
 
+// ==================== PARAMS ========================================================
+
 router.param("userId", getUserById);
 router.param("subjectId", getSubjectById);
+
+// ==================== ROUTES ========================================================
 
 router.post(
   "/payment/create-receipt/:userId/:subjectId",

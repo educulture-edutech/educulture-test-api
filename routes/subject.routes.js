@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+// ================== IMPORTS ======================================
+
 const { getUserById } = require("../controllers/user.controller");
 const {
   isSignIn,
@@ -14,10 +16,12 @@ const {
   getSubjectById,
 } = require("../controllers/subject.controller");
 
-// params
+// ================== PARAMS =======================================
 router.param("userId", getUserById);
 
 router.param("subjectId", getSubjectById);
+
+// ================== ROUTES =======================================
 
 router.post(
   "/subject/create-subject/:userId",

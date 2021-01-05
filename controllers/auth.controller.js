@@ -358,19 +358,19 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-exports.isTokenExpired = async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1].toString();
-  jwt.verify(token, process.env.SECRET, (err, verifiedJwt) => {
-    if (err) {
-      console.log(err);
-      let newToken = jwt.sign({ _id: req.profile._id }, process.env.SECRET, {
-        expiresIn: "1d",
-      });
-      req.headers.authorization = `Bearer ${newToken}`;
-      console.log("newToken: ", req.headers.authorization);
-      next();
-    } else {
-      next();
-    }
-  });
-};
+// exports.isTokenExpired = async (req, res, next) => {
+//   const token = req.headers.authorization.split(" ")[1].toString();
+//   jwt.verify(token, process.env.SECRET, (err, verifiedJwt) => {
+//     if (err) {
+//       console.log(err);
+//       let newToken = jwt.sign({ _id: req.profile._id }, process.env.SECRET, {
+//         expiresIn: "1d",
+//       });
+//       req.headers.authorization = `Bearer ${newToken}`;
+//       console.log("newToken: ", req.headers.authorization);
+//       next();
+//     } else {
+//       next();
+//     }
+//   });
+// };
