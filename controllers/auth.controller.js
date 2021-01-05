@@ -335,7 +335,6 @@ exports.isSignIn = expressjwt({
   secret: process.env.SECRET,
   userProperty: "auth",
   algorithms: ["HS256"],
-  credentialsRequired: false, // only in production mode
 });
 
 exports.isAuthenticated = (req, res, next) => {

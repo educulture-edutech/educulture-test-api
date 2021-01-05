@@ -6,6 +6,7 @@ const cors = require("cors");
 const compression = require("compression");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
+const jwt = require("express-jwt");
 
 // ===================== DATABASE CONNECTION =======================================
 
