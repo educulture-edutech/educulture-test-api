@@ -79,7 +79,7 @@ exports.registerUser = async (req, res) => {
 
     // after saving sign jwt token and return it
     let token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-      expiresIn: "300000ms",
+      expiresIn: "120000ms",
     });
 
     const {
@@ -207,7 +207,7 @@ exports.loginUser = async (req, res) => {
     if (user.password === encry_password) {
       // if password is correct generate token
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: "300000ms",
+        expiresIn: "120000ms",
       });
 
       const {
