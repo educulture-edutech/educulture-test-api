@@ -5,6 +5,7 @@ const {
   createReceipt,
   paymentSuccess,
   subscribeFreeSubject,
+  verifyReferralCode,
 } = require("../controllers/payment.controller");
 const { getSubjectById } = require("../controllers/subject.controller");
 const { isSignIn, isAuthenticated } = require("../controllers/auth.controller");
@@ -31,6 +32,13 @@ router.put(
   isSignIn,
   isAuthenticated,
   subscribeFreeSubject
+);
+
+router.get(
+  "/payment/verify-referral-code/:userId",
+  isSignIn,
+  isAuthenticated,
+  verifyReferralCode
 );
 
 module.exports = router;

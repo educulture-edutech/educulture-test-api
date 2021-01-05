@@ -252,6 +252,30 @@ exports.subscribeFreeSubject = async (req, res) => {
   }
 };
 
+exports.verifyReferralCode = async (req, res) => {
+  const clientReferralCode = req.query.referralCode.toString();
+
+  const referralCodeArray = ["NIRAVDA"];
+
+  let flag = 0;
+
+  for (let i = 0; i < referralCodeArray.length; i++) {
+    if (referralCodeArray[i] === clientReferralCode) {
+      flag = 1;
+      break;
+    }
+  }
+
+  if (flag !== 0)
+    return res.status(200).json({
+      message: "applicable",
+    });
+  else
+    return res.status(200).json({
+      message: "not applicable",
+    });
+};
+
 // const dayjs = require("dayjs");
 
 // const purchaseDate = dayjs();
