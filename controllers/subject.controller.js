@@ -72,7 +72,7 @@ exports.getAllSubjects = async (req, res) => {
 
 exports.getSubjectData = async (req, res) => {
   let flag = 0;
-  const userPurchaseList = req.profile.userPurchaseList;
+  let userPurchaseList = req.profile.userPurchaseList;
   // check if requested subject is free
   if (req.subject.free == true) {
     try {
@@ -147,6 +147,7 @@ exports.getSubjectData = async (req, res) => {
           console.log("entered");
           const currentDate = dayjs();
           if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
+            console.log("subject crossed expiry date");
             userPurchaseList[i].isExpired = true;
             flag = 1;
             break;

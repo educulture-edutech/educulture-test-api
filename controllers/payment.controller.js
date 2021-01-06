@@ -101,7 +101,7 @@ exports.paymentSuccess = async (req, res) => {
 
     // store everything in database
     const purchaseDate = dayjs();
-    const expiryDate = purchaseDate.add(Number(req.subject.duration), "minute");
+    const expiryDate = purchaseDate.add(Number(req.subject.duration), "day");
     // initiate purchase object to push in userPurchaseList
     const purchase = {
       subject_id: req.subject._id,
