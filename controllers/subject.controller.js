@@ -70,6 +70,7 @@ exports.getAllSubjects = async (req, res) => {
   }
 };
 
+// do not touch this API at all. It is very fragile in nature.
 exports.getSubjectData = async (req, res) => {
   let flag = 0;
   let userPurchaseList = req.profile.userPurchaseList;
