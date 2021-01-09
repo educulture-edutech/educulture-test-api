@@ -138,12 +138,11 @@ exports.getSubjectData = async (req, res) => {
       }
     } else {
       console.log("checking if subject is in userPurchaseList");
-      console.log("subject_id", userPurchaseList[0].subject_id);
-      console.log("_id", req.subject._id);
       for (let i = 0; i < userPurchaseList.length; i++) {
         if (
           userPurchaseList[i].subject_id.toString() ===
-          req.subject._id.toString()
+            req.subject._id.toString() &&
+          userPurchaseList[i].isExpired !== true
         ) {
           console.log("entered");
           const currentDate = dayjs();
@@ -313,6 +312,147 @@ exports.getAdvertisements = async (req, res) => {
 };
 
 // sample stringify json data for creating new subject
+
+exports.getSubjectData = async (req, res) => {
+  let flag = 0;
+  let userPurchaseList = req.profile.userPurchaseList;
+  // check if requested subject is free
+  if (req.subject.free == true) {
+    try {
+      const subject = await Subject.findOne({ _id: req.subject._id });
+      if (!subject) {
+        return res.status(404).json({
+          error: "subject not found in database",
+        });
+      } else {
+        return res.status(200).json(subject);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  }
+
+  // subject is paid
+  else {
+    // check if subject data is in user purchase list
+    console.log(userPurchaseList);
+    if (userPurchaseList.length <= 0) {
+      console.log("userPurchaseList is empty");
+      const subjectData = nullSubjectData(req.subject._id);
+      return res.status(200).json(subjectData);
+    }
+    //
+    else {
+      console.log("checking if subject is in userPurchaseList");
+      let trueFlag = 0;
+      let setIndex = -1;
+
+      for (let i = 0; i < userPurchaseList.length; i++) {
+        if (
+          userPurchaseList.subject_id.toString() === req.subject._id &&
+          userPurchaseList[i].isExpired === false
+        ) {
+          setIndex = i;
+          trueFlag = 1;
+        }
+      }
+
+      if (trueFlag !== 0) {
+        if (
+          userPurchaseList[setIndex].subjectId.toString() === req.subject._id &&
+          userPurchaseList[setIndex].isExpired === false
+        ) {
+          // check if subject expiry is crossed
+          if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
+            console.log("expiry date is crossed");
+            console.log("making changes in database");
+            userPurchaseList[setIndex].isExpired = true;
+
+            const user = await User.findOneAndUpdate(
+              { _id: req.profile._id },
+              { $set: { userPurchaseList: userPurchaseList } },
+              { new: true }
+            );
+
+            if (!user) {
+              return res.status(500).json({
+                error: "userPurchaseList is not updated.",
+              });
+            } else {
+              let subjectData = nullSubjectData(req.subject._id);
+              return res.status(200).json(subjectData);
+            }
+          } else {
+            try {
+              const subject = await Subject.findOne({
+                _id: userPurchaseList[i].subject_id,
+              });
+              if (!subject) {
+                return res.status(404).json({
+                  error: "subject not found in the database",
+                });
+              } else {
+                console.log("SUBJECT FOUND: ", subject);
+                return res.status(200).json(subject);
+              }
+            } catch (error) {
+              console.log(error);
+              return res.status(500).send(error);
+            }
+          }
+        }
+      }
+      //
+      else {
+        let subjectData = nullSubjectData(req.subject._id);
+        return res.status(200).json(subjectData);
+      }
+    }
+  }
+};
+
+const nullSubjectData = async (subjectId) => {
+  try {
+    // subject validity expired ERR 403 only expose two first chapter
+    const subject = await Subject.findOne({
+      _id: subjectId,
+    });
+    if (!subject) {
+      return res.status(404).json({
+        error: "subject not found in the database",
+      });
+    } else {
+      let newSubjectDTO = subject;
+      let subtopics = newSubjectDTO.subtopics;
+
+      for (let i = 0; i < subtopics.length; i++) {
+        if (i !== 0) {
+          let chapters = subtopics[i].chapters;
+
+          for (let j = 0; j < chapters.length; j++) {
+            chapters[j].chapterId = null;
+            chapters[j].url = null;
+          }
+          // console.log(chapters);
+        } else {
+          let chapters = subtopics[i].chapters;
+          for (let j = 1; j < chapters.length; j++) {
+            chapters[j].chapterId = null;
+            chapters[j].url = null;
+          }
+        }
+      }
+
+      // return this unexposed subject
+
+      return newSubjectDTO;
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
 
 /*
 
