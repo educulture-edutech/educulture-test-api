@@ -116,6 +116,7 @@ exports.getSubjectData = async (req, res) => {
         ) {
           setIndex = i;
           trueFlag = 1;
+          break;
         }
       }
 
