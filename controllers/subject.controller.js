@@ -413,6 +413,7 @@ exports.getSubjectData = async (req, res) => {
 };
 
 const nullSubjectData = async (subjectId) => {
+  console.log("nullSubjectData is called");
   try {
     // subject validity expired ERR 403 only expose two first chapter
     const subject = await Subject.findOne({
