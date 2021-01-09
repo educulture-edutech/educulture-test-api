@@ -122,53 +122,45 @@ exports.getSubjectData = async (req, res) => {
       }
 
       if (trueFlag !== 0) {
-        if (
-          userPurchaseList[setIndex].subject_id === req.subject._id &&
-          userPurchaseList[setIndex].isExpired === false
-        ) {
-          // check if subject expiry is crossed
-          if (
-            currentDate.isAfter(dayjs(userPurchaseList[setIndex].expiryDate))
-          ) {
-            console.log("expiry date is crossed");
-            console.log("making changes in database");
-            userPurchaseList[setIndex].isExpired = true;
+        // check if subject expiry is crossed
+        const currentDate = dayjs();
+        if (currentDate.isAfter(dayjs(userPurchaseList[setIndex].expiryDate))) {
+          console.log("expiry date is crossed");
+          console.log("making changes in database");
+          userPurchaseList[setIndex].isExpired = true;
 
-            const user = await User.findOneAndUpdate(
-              { _id: req.profile._id },
-              { $set: { userPurchaseList: userPurchaseList } },
-              { new: true }
-            );
+          const user = await User.findOneAndUpdate(
+            { _id: req.profile._id },
+            { $set: { userPurchaseList: userPurchaseList } },
+            { new: true }
+          );
 
-            if (!user) {
-              return res.status(500).json({
-                error: "userPurchaseList is not updated.",
-              });
-            } else {
-              const subjectData = await nullSubjectData(req.subject._id);
-              return res.status(200).json(subjectData);
-            }
+          if (!user) {
+            return res.status(500).json({
+              error: "userPurchaseList is not updated.",
+            });
           } else {
-            try {
-              const subject = await Subject.findOne({
-                _id: userPurchaseList[i].subject_id,
-              });
-              if (!subject) {
-                return res.status(404).json({
-                  error: "subject not found in the database",
-                });
-              } else {
-                console.log("SUBJECT FOUND: ", subject);
-                return res.status(200).json(subject);
-              }
-            } catch (error) {
-              console.log(error);
-              return res.status(500).send(error);
-            }
+            const subjectData = await nullSubjectData(req.subject._id);
+            return res.status(200).json(subjectData);
           }
         } else {
-          const subjectData = await nullSubjectData(req.subject._id);
-          return res.status(200).json(subjectData);
+          console.log("expiry date is not crossed.");
+          try {
+            const subject = await Subject.findOne({
+              _id: userPurchaseList[setIndex].subject_id,
+            });
+            if (!subject) {
+              return res.status(404).json({
+                error: "subject not found in the database",
+              });
+            } else {
+              console.log("SUBJECT FOUND: ", subject);
+              return res.status(200).json(subject);
+            }
+          } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+          }
         }
       }
       //
