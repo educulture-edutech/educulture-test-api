@@ -114,6 +114,7 @@ exports.getSubjectData = async (req, res) => {
             req.subject._id.toString() &&
           userPurchaseList[i].isExpired === false
         ) {
+          console.log("entered/");
           setIndex = i;
           trueFlag = 1;
           break;
@@ -122,11 +123,13 @@ exports.getSubjectData = async (req, res) => {
 
       if (trueFlag !== 0) {
         if (
-          userPurchaseList[setIndex].subjectId.toString() === req.subject._id &&
+          userPurchaseList[setIndex].subject_id === req.subject._id &&
           userPurchaseList[setIndex].isExpired === false
         ) {
           // check if subject expiry is crossed
-          if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
+          if (
+            currentDate.isAfter(dayjs(userPurchaseList[setIndex].expiryDate))
+          ) {
             console.log("expiry date is crossed");
             console.log("making changes in database");
             userPurchaseList[setIndex].isExpired = true;
@@ -163,6 +166,9 @@ exports.getSubjectData = async (req, res) => {
               return res.status(500).send(error);
             }
           }
+        } else {
+          const subjectData = await nullSubjectData(req.subject._id);
+          return res.status(200).json(subjectData);
         }
       }
       //
