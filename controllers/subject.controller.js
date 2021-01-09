@@ -143,8 +143,7 @@ exports.getSubjectData = async (req, res) => {
       for (let i = 0; i < userPurchaseList.length; i++) {
         if (
           userPurchaseList[i].subject_id.toString() ===
-            req.subject._id.toString() &&
-          userPurchaseList[i].isExpired !== true
+          req.subject._id.toString()
         ) {
           console.log("entered");
           const currentDate = dayjs();
