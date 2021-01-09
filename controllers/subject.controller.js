@@ -72,248 +72,7 @@ exports.getAllSubjects = async (req, res) => {
 
 // do not touch this API at all. It is very fragile in nature.
 exports.getSubjectData = async (req, res) => {
-  let flag = 0;
-  let userPurchaseList = req.profile.userPurchaseList;
-  // check if requested subject is free
-  if (req.subject.free == true) {
-    try {
-      const subject = await Subject.findOne({ _id: req.subject._id });
-      if (!subject) {
-        return res.status(404).json({
-          error: "subject not found in database",
-        });
-      } else {
-        return res.status(200).json(subject);
-      }
-    } catch (error) {
-      console.log(error);
-      return res.status(500).send(error);
-    }
-  }
-
-  // subject is paid
-  else {
-    // check if subject data is in user purchase list
-
-    console.log(userPurchaseList);
-    if (userPurchaseList.length <= 0) {
-      console.log("userPurchaseList is empty");
-      try {
-        // subject validity expired ERR 403 only expose two first chapter
-        const subject = await Subject.findOne({
-          _id: req.subject._id,
-        });
-        if (!subject) {
-          return res.status(404).json({
-            error: "subject not found in the database",
-          });
-        } else {
-          let newSubjectDTO = subject;
-          let subtopics = newSubjectDTO.subtopics;
-
-          for (let i = 0; i < subtopics.length; i++) {
-            if (i !== 0) {
-              let chapters = subtopics[i].chapters;
-
-              for (let j = 0; j < chapters.length; j++) {
-                chapters[j].chapterId = null;
-                chapters[j].url = null;
-              }
-              // console.log(chapters);
-            } else {
-              let chapters = subtopics[i].chapters;
-              for (let j = 1; j < chapters.length; j++) {
-                chapters[j].chapterId = null;
-                chapters[j].url = null;
-              }
-            }
-          }
-
-          // return this unexposed subject
-          return res.status(200).json(newSubjectDTO);
-        }
-      } catch (error) {
-        console.log(error);
-        return res.status(500).send(error);
-      }
-    } else {
-      console.log("checking if subject is in userPurchaseList");
-      for (let i = 0; i < userPurchaseList.length; i++) {
-        if (
-          userPurchaseList[i].subject_id.toString() ===
-            req.subject._id.toString() &&
-          userPurchaseList[i].isExpired !== true
-        ) {
-          console.log("entered");
-          const currentDate = dayjs();
-          if (currentDate.isAfter(dayjs(userPurchaseList[i].expiryDate))) {
-            console.log("subject crossed expiry date");
-            userPurchaseList[i].isExpired = true;
-            flag = 1;
-            break;
-          }
-          //
-          else {
-            // expiry date is not crossed. return subject data
-            try {
-              const subject = await Subject.findOne({
-                _id: userPurchaseList[i].subject_id,
-              });
-              if (!subject) {
-                return res.status(404).json({
-                  error: "subject not found in the database",
-                });
-              } else {
-                console.log("SUBJECT FOUND: ", subject);
-                return res.status(200).json(subject);
-              }
-            } catch (error) {
-              console.log(error);
-              return res.status(500).send(error);
-            }
-          }
-        }
-        //
-        else {
-          // subject is not in userPurchaseList ERR 403 only expose first chapter
-          try {
-            // subject validity expired ERR 403 only expose two first chapter
-            const subject = await Subject.findOne({
-              _id: req.subject._id,
-            });
-            if (!subject) {
-              return res.status(404).json({
-                error: "subject not found in the database",
-              });
-            } else {
-              let newSubjectDTO = subject;
-              let subtopics = newSubjectDTO.subtopics;
-
-              for (let i = 0; i < subtopics.length; i++) {
-                if (i !== 0) {
-                  let chapters = subtopics[i].chapters;
-
-                  for (let j = 0; j < chapters.length; j++) {
-                    chapters[j].chapterId = null;
-                    chapters[j].url = null;
-                  }
-                  // console.log(chapters);
-                } else {
-                  let chapters = subtopics[i].chapters;
-                  for (let j = 1; j < chapters.length; j++) {
-                    chapters[j].chapterId = null;
-                    chapters[j].url = null;
-                  }
-                }
-              }
-
-              // return this unexposed subject
-              return res.status(200).json(newSubjectDTO);
-            }
-          } catch (error) {
-            console.log(error);
-            return res.status(500).send(error);
-          }
-        }
-      }
-
-      if (flag !== 0) {
-        // something is changed in userPurchaseList
-        // so update the userPurchaseList
-
-        const user = await User.findOneAndUpdate(
-          { _id: req.profile._id },
-          { $set: { userPurchaseList: userPurchaseList } },
-          { new: true }
-        );
-
-        if (!user) {
-          return res.status(500).json({
-            error: "userPurchaseList is not updated.",
-          });
-        } else {
-          // still returns the subject data
-          try {
-            // subject validity expired ERR 403 only expose two first chapter
-            const subject = await Subject.findOne({
-              _id: req.subject._id,
-            });
-            if (!subject) {
-              return res.status(404).json({
-                error: "subject not found in the database",
-              });
-            } else {
-              let newSubjectDTO = subject;
-              let subtopics = newSubjectDTO.subtopics;
-
-              for (let i = 0; i < subtopics.length; i++) {
-                if (i !== 0) {
-                  let chapters = subtopics[i].chapters;
-
-                  for (let j = 0; j < chapters.length; j++) {
-                    chapters[j].chapterId = null;
-                    chapters[j].url = null;
-                  }
-                  // console.log(chapters);
-                } else {
-                  let chapters = subtopics[i].chapters;
-                  for (let j = 1; j < chapters.length; j++) {
-                    chapters[j].chapterId = null;
-                    chapters[j].url = null;
-                  }
-                }
-              }
-
-              // return this unexposed subject
-              return res.status(200).json(newSubjectDTO);
-            }
-          } catch (error) {
-            console.log(error);
-            return res.status(500).send(error);
-          }
-        }
-      }
-    }
-  }
-};
-
-exports.getAdvertisements = async (req, res) => {
-  // this api will give data of all free subjects under the goalId
-  const goalId = req.profile.goalSelected;
-
-  try {
-    const subjects = await Subject.find({ goalId: goalId, free: true });
-
-    if (!subjects) {
-      return res.status(404).json({
-        error: "error in getting free subjects under this goalId",
-      });
-    } else {
-      subjects.map((subject) => {
-        subject.subtopics = undefined;
-        subject.goalId = undefined;
-        subject.subjectDescription = undefined;
-        // subject.instructor = undefined;
-        subject.instructorId = undefined;
-        subject.price = undefined;
-        // subject.free = undefined;
-        subject.duration = undefined;
-        subject.createdAt = undefined;
-        subject.updatedAt = undefined;
-        subject.__v = undefined;
-      });
-
-      return res.status(200).json(subjects);
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
-  }
-};
-
-// sample stringify json data for creating new subject
-
-exports.getSubjectData = async (req, res) => {
+  console.log("called");
   let flag = 0;
   let userPurchaseList = req.profile.userPurchaseList;
   // check if requested subject is free
@@ -339,7 +98,8 @@ exports.getSubjectData = async (req, res) => {
     console.log(userPurchaseList);
     if (userPurchaseList.length <= 0) {
       console.log("userPurchaseList is empty");
-      const subjectData = nullSubjectData(req.subject._id);
+      const subjectData = await nullSubjectData(req.subject._id);
+      console.log(subjectData);
       return res.status(200).json(subjectData);
     }
     //
@@ -380,7 +140,7 @@ exports.getSubjectData = async (req, res) => {
                 error: "userPurchaseList is not updated.",
               });
             } else {
-              let subjectData = nullSubjectData(req.subject._id);
+              const subjectData = await nullSubjectData(req.subject._id);
               return res.status(200).json(subjectData);
             }
           } else {
@@ -405,7 +165,7 @@ exports.getSubjectData = async (req, res) => {
       }
       //
       else {
-        let subjectData = nullSubjectData(req.subject._id);
+        const subjectData = await nullSubjectData(req.subject._id);
         return res.status(200).json(subjectData);
       }
     }
@@ -446,7 +206,6 @@ const nullSubjectData = async (subjectId) => {
       }
 
       // return this unexposed subject
-
       return newSubjectDTO;
     }
   } catch (error) {
@@ -454,6 +213,42 @@ const nullSubjectData = async (subjectId) => {
     return res.status(500).send(error);
   }
 };
+
+exports.getAdvertisements = async (req, res) => {
+  // this api will give data of all free subjects under the goalId
+  const goalId = req.profile.goalSelected;
+
+  try {
+    const subjects = await Subject.find({ goalId: goalId, free: true });
+
+    if (!subjects) {
+      return res.status(404).json({
+        error: "error in getting free subjects under this goalId",
+      });
+    } else {
+      subjects.map((subject) => {
+        subject.subtopics = undefined;
+        subject.goalId = undefined;
+        subject.subjectDescription = undefined;
+        // subject.instructor = undefined;
+        subject.instructorId = undefined;
+        subject.price = undefined;
+        // subject.free = undefined;
+        subject.duration = undefined;
+        subject.createdAt = undefined;
+        subject.updatedAt = undefined;
+        subject.__v = undefined;
+      });
+
+      return res.status(200).json(subjects);
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+};
+
+// sample stringify json data for creating new subject
 
 /*
 
