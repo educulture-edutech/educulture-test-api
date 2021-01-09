@@ -110,7 +110,8 @@ exports.getSubjectData = async (req, res) => {
 
       for (let i = 0; i < userPurchaseList.length; i++) {
         if (
-          userPurchaseList.subject_id.toString() === req.subject._id &&
+          userPurchaseList[i].subject_id.toString() ===
+            req.subject._id.toString() &&
           userPurchaseList[i].isExpired === false
         ) {
           setIndex = i;
