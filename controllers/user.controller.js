@@ -86,6 +86,20 @@ exports.getAllGoals = async (req, res) => {
 exports.getUserAccount = async (req, res) => {
   if (req.profile) {
     req.profile.password = undefined;
+    // also we need to send only those subjects where isExpired not true so we need
+    // to update the userPurchaseList
+    const purchaseList = req.profile.userPurchaseList;
+    let newPurchaseList = [];
+
+    purchaseList.map((purchaseObj) => {
+      if (purchaseObj.isExpired !== true) {
+        newPurchaseList.push(purchaseObj);
+      }
+    });
+
+    req.profile.userPurchaseList = newPurchaseList;
+
+    // hence req.profile is updated
     return res.status(200).json(req.profile);
   } else {
     return res.status(404).json({
@@ -96,7 +110,18 @@ exports.getUserAccount = async (req, res) => {
 
 exports.getUserPurchaseList = async (req, res) => {
   if (req.profile) {
-    return res.status(200).json(req.profile.userPurchaseList);
+    // we need to only send those courses whose isExpired is false
+    const purchaseList = req.profile.userPurchaseList;
+
+    let newPurchaseList = [];
+
+    purchaseList.map((purchaseObj) => {
+      if (purchaseObj.isExpired !== true) {
+        newPurchaseList.push(purchaseObj);
+      }
+    });
+
+    return res.status(200).json(newPurchaseList);
   } else {
     return res.status(404).json({
       error: "user not found.",
