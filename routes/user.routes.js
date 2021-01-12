@@ -9,18 +9,29 @@ const {
   getUserPurchaseList,
   clearUserPurchaseList,
 } = require("../controllers/user.controller");
-const { isSignIn, isAuthenticated } = require("../controllers/auth.controller");
+const {
+  isSignIn,
+  isAuthenticated,
+  isTokenExpired,
+} = require("../controllers/auth.controller");
 
 // params
 router.param("userId", getUserById);
 
 // routes
-router.put("/user/update-goal/:userId", isSignIn, isAuthenticated, updateGoals);
+router.put(
+  "/user/update-goal/:userId",
+  isTokenExpired,
+  isSignIn,
+  isAuthenticated,
+  updateGoals
+);
 
 router.get("/user/get-goals", getAllGoals);
 
 router.get(
   "/user/get-account/:userId",
+  isTokenExpired,
   isSignIn,
   isAuthenticated,
   getUserAccount
@@ -28,6 +39,7 @@ router.get(
 
 router.get(
   "/user/get-subscriptions/:userId",
+  isTokenExpired,
   isSignIn,
   isAuthenticated,
   getUserPurchaseList
@@ -35,6 +47,7 @@ router.get(
 
 router.delete(
   "/user/delete-account/:userId",
+  isTokenExpired,
   isSignIn,
   isAuthenticated,
   deleteAccount

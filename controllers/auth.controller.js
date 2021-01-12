@@ -79,7 +79,7 @@ exports.registerUser = async (req, res) => {
 
     // after saving sign jwt token and return it
     let token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-      expiresIn: "1d",
+      expiresIn: "300000",
     });
 
     const {
@@ -207,7 +207,7 @@ exports.loginUser = async (req, res) => {
     if (user.password === encry_password) {
       // if password is correct generate token
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: "1d",
+        expiresIn: "300000",
       });
 
       const {
@@ -300,7 +300,7 @@ exports.intializeResetPassword = async (req, res) => {
       } else {
         const userId = user._id;
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "1d",
+          expiresIn: "300000",
         });
 
         fetch(
@@ -358,19 +358,20 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
-// exports.isTokenExpired = async (req, res, next) => {
-//   const token = req.headers.authorization.split(" ")[1].toString();
-//   jwt.verify(token, process.env.SECRET, (err, verifiedJwt) => {
-//     if (err) {
-//       console.log(err);
-//       let newToken = jwt.sign({ _id: req.profile._id }, process.env.SECRET, {
-//         expiresIn: "1d",
-//       });
-//       req.headers.authorization = `Bearer ${newToken}`;
-//       console.log("newToken: ", req.headers.authorization);
-//       next();
-//     } else {
-//       next();
-//     }
-//   });
-// };
+exports.isTokenExpired = async (req, res, next) => {
+  const token = req.headers.authorization.split(" ")[1].toString();
+  jwt.verify(token, process.env.SECRET, (err, decodedTokenInfo) => {
+    if (err) {
+      console.log(err);
+      return res.status(133);
+      // let newToken = jwt.sign({ _id: req.profile._id }, process.env.SECRET, {
+      //   expiresIn: "1d",
+      // });
+      // req.headers.authorization = `Bearer ${newToken}`;
+      // console.log("newToken: ", req.headers.authorization);
+      // next();
+    } else {
+      next();
+    }
+  });
+};

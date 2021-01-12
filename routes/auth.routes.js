@@ -24,14 +24,27 @@ router.get("/account/check-number", checkNumber);
 
 router.post("/account/register", registerUser);
 
-router.get("/account/sendOTP/:userId", isSignIn, isAuthenticated, sendOTP);
+router.get(
+  "/account/sendOTP/:userId",
+  isTokenExpired,
+  isSignIn,
+  isAuthenticated,
+  sendOTP
+);
 
-router.get("/account/verifyOTP/:userId", isSignIn, isAuthenticated, verifyOTP);
+router.get(
+  "/account/verifyOTP/:userId",
+  isTokenExpired,
+  isSignIn,
+  isAuthenticated,
+  verifyOTP
+);
 
 router.post("/account/login", loginUser);
 
 router.put(
   "/account/reset-password/:userId",
+  isTokenExpired,
   isSignIn,
   isAuthenticated,
   resetPassword
