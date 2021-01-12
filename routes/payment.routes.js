@@ -10,11 +10,7 @@ const {
   verifyReferralCode,
 } = require("../controllers/payment.controller");
 const { getSubjectById } = require("../controllers/subject.controller");
-const {
-  isSignIn,
-  isAuthenticated,
-  isTokenExpired,
-} = require("../controllers/auth.controller");
+const { isSignIn, isAuthenticated } = require("../controllers/auth.controller");
 
 // ==================== PARAMS ========================================================
 
@@ -25,7 +21,6 @@ router.param("subjectId", getSubjectById);
 
 router.post(
   "/payment/create-receipt/:userId/:subjectId",
-  isTokenExpired,
   isSignIn,
   isAuthenticated,
   createReceipt
@@ -33,7 +28,6 @@ router.post(
 
 router.put(
   "/payment/payment-success-receipt/:userId/:subjectId",
-  isTokenExpired,
   isSignIn,
   isAuthenticated,
   paymentSuccess
@@ -41,7 +35,6 @@ router.put(
 
 router.put(
   "/subscribe-free-subject/:userId/:subjectId",
-  isTokenExpired,
   isSignIn,
   isAuthenticated,
   subscribeFreeSubject
@@ -49,7 +42,6 @@ router.put(
 
 router.get(
   "/payment/verify-referral-code/:userId",
-  isTokenExpired,
   isSignIn,
   isAuthenticated,
   verifyReferralCode
