@@ -358,6 +358,26 @@ exports.isAdmin = (req, res, next) => {
   next();
 };
 
+exports.tokenVerify = async (req, res, next) => {
+  try {
+    if (!req.headers.authorization) {
+      return res.status(406).end();
+    }
+
+    const token = req.headers.authorization.split(" ")[1];
+
+    jwt.verify(token, process.env.SECRET, function (err, decoded) {
+      if (err) {
+        return res.status(406).end();
+      }
+
+      next();
+    });
+  } catch (error) {
+    return res.status(406).end();
+  }
+};
+
 // exports.isTokenExpired = async (req, res, next) => {
 //   const token = req.headers.authorization.split(" ")[1].toString();
 //   jwt.verify(token, process.env.SECRET, (err, decodedTokenInfo) => {

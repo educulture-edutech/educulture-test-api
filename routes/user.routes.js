@@ -9,7 +9,11 @@ const {
   getUserPurchaseList,
   clearUserPurchaseList,
 } = require("../controllers/user.controller");
-const { isSignIn, isAuthenticated } = require("../controllers/auth.controller");
+const {
+  isSignIn,
+  isAuthenticated,
+  tokenVerify,
+} = require("../controllers/auth.controller");
 
 // params
 router.param("userId", getUserById);
@@ -21,6 +25,7 @@ router.get("/user/get-goals", getAllGoals);
 
 router.get(
   "/user/get-account/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   getUserAccount

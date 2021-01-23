@@ -7,6 +7,7 @@ const {
   isSignIn,
   isAuthenticated,
   isAdmin,
+  tokenVerify,
 } = require("../controllers/auth.controller");
 const {
   createSubject,
@@ -40,6 +41,7 @@ router.get(
 
 router.get(
   "/subject/get-subject/:userId/:subjectId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   getSubjectData
