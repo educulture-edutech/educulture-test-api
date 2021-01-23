@@ -26,6 +26,7 @@ router.param("subjectId", getSubjectById);
 
 router.post(
   "/subject/create-subject/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   isAdmin,
@@ -34,6 +35,7 @@ router.post(
 
 router.get(
   "/subject/all-subjects/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   getAllSubjects
@@ -49,6 +51,7 @@ router.get(
 
 router.get(
   "/subject/get-advertisement/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   getAdvertisements

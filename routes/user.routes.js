@@ -1,5 +1,7 @@
 const router = require("express").Router();
 
+// ===================== IMPORTS ======================================================
+
 const {
   getUserById,
   updateGoals,
@@ -15,11 +17,19 @@ const {
   tokenVerify,
 } = require("../controllers/auth.controller");
 
-// params
+// ==================== PARAMS ========================================================
+
 router.param("userId", getUserById);
 
-// routes
-router.put("/user/update-goal/:userId", isSignIn, isAuthenticated, updateGoals);
+// ==================== ROUTES ========================================================
+
+router.put(
+  "/user/update-goal/:userId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  updateGoals
+);
 
 router.get("/user/get-goals", getAllGoals);
 

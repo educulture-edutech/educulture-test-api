@@ -13,6 +13,7 @@ const {
   isAuthenticated,
   resetPassword,
   intializeResetPassword,
+  tokenVerify,
 } = require("../controllers/auth.controller");
 const { getUserById } = require("../controllers/user.controller");
 
@@ -24,14 +25,27 @@ router.get("/account/check-number", checkNumber);
 
 router.post("/account/register", registerUser);
 
-router.get("/account/sendOTP/:userId", isSignIn, isAuthenticated, sendOTP);
+router.get(
+  "/account/sendOTP/:userId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  sendOTP
+);
 
-router.get("/account/verifyOTP/:userId", isSignIn, isAuthenticated, verifyOTP);
+router.get(
+  "/account/verifyOTP/:userId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  verifyOTP
+);
 
 router.post("/account/login", loginUser);
 
 router.put(
   "/account/reset-password/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   resetPassword

@@ -29,13 +29,6 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(compression());
 app.use(helmet());
-app.use(function (err, req, res, next) {
-  if (err.name === "UnauthorizedError") {
-    res.status(404).json({
-      error: err.name + ": " + err.message,
-    });
-  }
-});
 
 // ====================== ROUTES IMPORTS ====================================================
 const authRoutes = require("./routes/auth.routes");
