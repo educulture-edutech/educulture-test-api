@@ -43,6 +43,7 @@ router.get(
 
 router.get(
   "/user/get-subscriptions/:userId",
+  tokenVerify,
   isSignIn,
   isAuthenticated,
   getUserPurchaseList
