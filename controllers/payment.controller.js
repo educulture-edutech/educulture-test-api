@@ -1,10 +1,13 @@
 const Payment = require("../models/payments.model");
 const User = require("../models/user.model");
-const dayjs = require("dayjs");
 const { nanoid } = require("nanoid");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-const redis = require("redis");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // ===================== RAZORPAY INITIALIZATION =====================================
 
@@ -100,7 +103,7 @@ exports.paymentSuccess = async (req, res) => {
     console.log("signatures matched -> payment verified.");
 
     // store everything in database
-    const purchaseDate = dayjs();
+    const purchaseDate = dayjs().tz("Asia/Kolkata");
     const expiryDate = purchaseDate.add(Number(req.subject.duration), "minute");
     // initiate purchase object to push in userPurchaseList
     const purchase = {
