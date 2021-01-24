@@ -433,7 +433,7 @@ exports.getAdvertisements = async (req, res) => {
 //   const currentDate = dayjs();
 
 //   if (currentDate.isAfter(dayjs(expiryDate))) {
-//     // currentDate crossed expiry date
+//     //  currentDate crossed expiry date
 
 //     // get userPurchaseList
 //     const userPurchaseList = req.profile.userPurchaseList;
