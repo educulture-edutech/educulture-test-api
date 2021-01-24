@@ -38,6 +38,34 @@ exports.createSubject = async (req, res) => {
   }
 };
 
+exports.updateSubject = async (req, res) => {
+  // update subject api only updates subtopics in the database
+  const subtopics = req.body.subtopics;
+
+  try {
+    const subject = await Subject.findOneAndUpdate(
+      { _id: req.subject._id },
+      { $set: { subtopics: subtopics } },
+      { new: true }
+    );
+
+    if (!subject) {
+      console.log("subject not found in db");
+      return res.status(404).json({
+        error: "subject not found in DB",
+      });
+    } else {
+      console.log("subtopic list is updated!!");
+      return res.status(200).json({
+        message: "success",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
+
 exports.getAllSubjects = async (req, res) => {
   const goalId = req.profile.goalSelected;
 

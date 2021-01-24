@@ -3,36 +3,40 @@ const { ObjectId } = mongoose.Schema;
 
 const paymentSchema = new mongoose.Schema(
   {
-    // used
-
-    user: {
-      type: ObjectId,
-      ref: "User",
-    },
-
-    // used
-
-    subject: {
-      type: ObjectId,
-      ref: "Subject",
-      trim: true,
-    },
-
-    // used
-
-    paymentType: {
+    userId: {
       type: String,
       trim: true,
     },
 
-    // used
+    firstName: {
+      type: String,
+      trim: true,
+    },
+
+    lastName: {
+      type: String,
+      trim: true,
+    },
+
+    subject_id: {
+      type: String,
+      trim: true,
+    },
+
+    subjectId: {
+      type: String,
+      trim: true,
+    },
+
+    subjectName: {
+      type: String,
+      trim: true,
+    },
 
     orderId: {
       type: String,
       trim: true,
     },
-
-    // used
 
     referenceId: {
       type: String,
