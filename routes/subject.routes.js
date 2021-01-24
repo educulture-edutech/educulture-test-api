@@ -15,6 +15,7 @@ const {
   getAdvertisements,
   getSubjectData,
   getSubjectById,
+  updateSubject,
 } = require("../controllers/subject.controller");
 
 // ================== PARAMS =======================================
@@ -31,6 +32,15 @@ router.post(
   isAuthenticated,
   isAdmin,
   createSubject
+);
+
+router.put(
+  "/subject/update-subject/:userId/:subjectId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  isAdmin,
+  updateSubject
 );
 
 router.get(

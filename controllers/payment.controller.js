@@ -25,6 +25,8 @@ exports.createReceipt = async (req, res) => {
 
   // create random referenceId for receipt
   const referenceId = await nanoid(10);
+  const cgst = "0";
+  const sgst = "0";
   console.log(referenceId);
 
   // razorpay
@@ -47,15 +49,18 @@ exports.createReceipt = async (req, res) => {
       console.log("orderObj created by razorpay API: ", order);
       try {
         const payment = new Payment({
-          user: req.profile._id,
-          subject: req.subject._id,
-          // paymentType: paymentType,
+          userId: req.profile._id,
+          firstName: req.profile.firstName,
+          lastName: req.profile.lastName,
+          subject_id: req.subject._id,
+          subjectId: req.subject.subjectId,
+          subjectName: req.subject.subjectName,
           orderId: order.id,
           referenceId: referenceId,
           subjectPrice: (order.amount / 100).toString(),
-          cgst: "0",
-          sgst: "0",
-          totalAmount: (Number(price) + Number(0) + Number(0)).toString(),
+          cgst: cgst,
+          sgst: sgst,
+          totalAmount: (Number(price) + Number(cgst) + Number(sgst)).toString(),
           paymentStatus: order.status,
         });
 
