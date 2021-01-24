@@ -43,7 +43,7 @@ app.use("/api", paymentRoutes);
 
 // ======================= SAMPLE TESTING ROUTE =============================================
 app.get("/my-app", (req, res) => {
-  res.send("hello.. you are runnig production api for educulture..");
+  res.send("hello.. you are running production api for educulture..");
 });
 
 // ======================= PORT DECLARATION =================================================
