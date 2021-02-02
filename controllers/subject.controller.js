@@ -1,6 +1,10 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // ================ PARAM FUNCTIONS ===================================
 
@@ -151,7 +155,7 @@ exports.getSubjectData = async (req, res) => {
 
       if (trueFlag !== 0) {
         // check if subject expiry is crossed
-        const currentDate = dayjs();
+        const currentDate = dayjs().tz("Asia/Kolkata");
         if (currentDate.isAfter(dayjs(userPurchaseList[setIndex].expiryDate))) {
           console.log("expiry date is crossed");
           console.log("making changes in database");

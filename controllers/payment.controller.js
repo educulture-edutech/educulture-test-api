@@ -97,7 +97,7 @@ exports.paymentSuccess = async (req, res) => {
   const referralCode = req.body.referralCode;
 
   const generate_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_SECRET)
+    .createHmac("sha256", process.env.RAZORPAY_LIVE_SECRET)
     .update(razorpay_order_id + "|" + razorpay_payment_id)
     .digest("hex");
 
