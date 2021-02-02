@@ -10,16 +10,21 @@ const {
   deleteAccount,
   getUserPurchaseList,
   clearUserPurchaseList,
+  pushSubjectToUserPurchaseList,
 } = require("../controllers/user.controller");
+
 const {
   isSignIn,
   isAuthenticated,
   tokenVerify,
+  isAdmin,
 } = require("../controllers/auth.controller");
+const { getSubjectById } = require("../controllers/subject.controller");
 
 // ==================== PARAMS ========================================================
 
 router.param("userId", getUserById);
+router.param("subjectId", getSubjectById);
 
 // ==================== ROUTES ========================================================
 
@@ -47,6 +52,15 @@ router.get(
   isSignIn,
   isAuthenticated,
   getUserPurchaseList
+);
+
+router.post(
+  "/user/push-subject/:userId/:subjectId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  isAdmin,
+  pushSubjectToUserPurchaseList
 );
 
 router.delete(
