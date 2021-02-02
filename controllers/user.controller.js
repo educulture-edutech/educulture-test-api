@@ -1,5 +1,10 @@
 const User = require("../models/user.model");
 const Subject = require("../models/subject.model");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 // ========================= PARAM FUNCTIONS =====================================
 
@@ -165,6 +170,57 @@ exports.clearUserPurchaseList = async (req, res) => {
     });
   } else {
     return res.status(200).json(user);
+  }
+};
+
+exports.pushSubjectToUserPurchaseList = async (req, res) => {
+  // create object to push in userPurchaseList
+
+  const userIdToPush = req.body.userIdToPush;
+
+  const purchaseDate = dayjs().tz("Asia/Kolkata");
+  const expiryDate = purchaseDate.add(Number(req.subject.duration), "minute");
+
+  const obj = {
+    subjectId: req.subject.subjectId,
+    subject_id: req.subject._id,
+    subjectName: req.subject.subjectName,
+    instructor: req.subject.instructor,
+    instructorId: req.subject.instructorId,
+    subjectThumbnail: req.subject.instructorId,
+    free: req.subject.free,
+    isExpired: false,
+    purchaseDate: purchaseDate.format(),
+    expiryDate: expiryDate.format(),
+    duration: req.subject.duration,
+    orderId: "NA",
+    referralCode: "EDCLTR",
+    backendPush: true,
+  };
+
+  // now just push this object in userPurchaseList
+  try {
+    // update the user purchase list
+    const user = await User.findOneAndUpdate(
+      { _id: userIdToPush },
+      { $push: { userPurchaseList: obj } },
+      { new: true }
+    );
+
+    if (!user) {
+      console.log("user not found in db");
+      return res.status(500).json({
+        message: "error",
+      });
+    } else {
+      console.log("payment verified -> course added in account -> success.");
+      return res.status(200).json({
+        message: "success",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
   }
 };
 
