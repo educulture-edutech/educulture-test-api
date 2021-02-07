@@ -77,6 +77,16 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    deviceId: {
+      type: String,
+      unique: true,
+    },
+
+    allowDeviceIdChange: {
+      type: Boolean,
+      unique: false,
+    },
+
     profileImage: {
       type: String,
       trim: true,

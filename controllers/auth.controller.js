@@ -46,11 +46,17 @@ exports.registerUser = async (req, res) => {
   const mobile = req.body.mobile.toString();
   const gender = req.body.gender.toString();
   const birthdate = req.body.birthdate.toString();
+  let deviceId;
 
   // const {firstName, lastName, email, password, mobile, gender, birthdate} = req.body;
 
   // console.log(req.body);
   // console.log(req.body.registrationDTO);
+  if (typeof req.body.deviceId === "undefined") {
+    deviceId = "";
+  } else {
+    deviceId = req.body.deviceId.toString();
+  }
 
   const encry_password = crypto
     .createHmac("sha256", process.env.SECRET)
@@ -64,6 +70,8 @@ exports.registerUser = async (req, res) => {
     email: email,
     mobile: mobile,
     gender: gender,
+    deviceId: deviceId,
+    allowDeviceIdChange: false,
     birthdate: birthdate,
     isAccountRegistered: true,
   });
@@ -92,6 +100,7 @@ exports.registerUser = async (req, res) => {
       goalSelected,
       role,
       gender,
+      deviceId,
       isAccountRegistered,
       isGoalSelected,
       isAccountVerified,
@@ -109,6 +118,7 @@ exports.registerUser = async (req, res) => {
       goalSelected,
       role,
       gender,
+      deviceId,
       isAccountRegistered,
       isGoalSelected,
       isAccountVerified,
@@ -195,59 +205,208 @@ exports.loginUser = async (req, res) => {
     .update(password)
     .digest("hex");
 
-  User.findOne({ mobile }, (err, user) => {
-    // mobile number will always be in DB. so no error
-    // map password
-    if (err || !user) {
-      return res.status(404).json({
-        error: "error in finding mobile number.",
-      });
+  // if deviceId = "" -> user still has old version of app so give login access
+  if (typeof req.body.deviceId === "undefined") {
+    // only check mobile and password
+    try {
+      const user = await User.findOne({ mobile: mobile });
+      if (!user) {
+        return res.status(404).json({
+          error: "error in finding mobile number.",
+        });
+      }
+
+      // else user found check if password is matching or not
+      if (user.password === encry_password) {
+        const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+          expiresIn: "1d",
+        });
+
+        const {
+          _id,
+          firstName,
+          lastName,
+          email,
+          mobile,
+          birthdate,
+          goalSelected,
+          role,
+          gender,
+          isAccountRegistered,
+          isGoalSelected,
+          isAccountVerified,
+          profileImage,
+        } = user;
+
+        return res.status(200).json({
+          _id,
+          token,
+          firstName,
+          lastName,
+          email,
+          mobile,
+          birthdate,
+          goalSelected,
+          role,
+          gender,
+          isAccountRegistered,
+          isGoalSelected,
+          isAccountVerified,
+          profileImage,
+        });
+      }
+
+      // password did not match
+      else {
+        return res.status(401).json({
+          error: "password does not match with mobile number.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      req.status(500).send(error);
     }
+  } else {
+    // device id has come through client means user has updated version
+    const deviceId = req.body.deviceId.toString(); // extract the deviceId
 
-    if (user.password === encry_password) {
-      // if password is correct generate token
-      const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-        expiresIn: "1d",
-      });
+    try {
+      const user = await User.findOne({ mobile: mobile });
+      if (!user) {
+        return res.status(404).json({
+          error: "error in finding mobile number.",
+        });
+      } else {
+        // check if admin has given some priviliges to this user or not
+        if (user.allowDeviceIdChange === true) {
+          // user can change the device id
+          changeDeviceId = await User.findOneAndUpdate(
+            { mobile: mobile },
+            { $set: { deviceId: deviceId, allowDeviceIdChange: false } },
+            { new: true }
+          );
 
-      const {
-        _id,
-        firstName,
-        lastName,
-        email,
-        mobile,
-        birthdate,
-        goalSelected,
-        role,
-        gender,
-        isAccountRegistered,
-        isGoalSelected,
-        isAccountVerified,
-        profileImage,
-      } = user;
+          if (!changeDeviceId) {
+            return res.status(404).json({
+              error: "You have changed your device. Kindly contact us.",
+            });
+          } else {
+            // now check for password
+            if (user.password === encry_password) {
+              const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+                expiresIn: "1d",
+              });
 
-      return res.status(200).json({
-        _id,
-        token,
-        firstName,
-        lastName,
-        email,
-        mobile,
-        birthdate,
-        goalSelected,
-        role,
-        gender,
-        isAccountRegistered,
-        isGoalSelected,
-        isAccountVerified,
-        profileImage,
-      });
-    } else {
-      return res.status(401).json({
-        error: "password does not match with mobile number.",
-      });
+              const {
+                _id,
+                firstName,
+                lastName,
+                email,
+                mobile,
+                birthdate,
+                goalSelected,
+                role,
+                gender,
+                deviceId,
+                isAccountRegistered,
+                isGoalSelected,
+                isAccountVerified,
+                profileImage,
+              } = user;
+
+              return res.status(200).json({
+                _id,
+                token,
+                firstName,
+                lastName,
+                email,
+                mobile,
+                birthdate,
+                goalSelected,
+                role,
+                gender,
+                deviceId,
+                isAccountRegistered,
+                isGoalSelected,
+                isAccountVerified,
+                profileImage,
+              });
+            } else {
+              return res.status(401).json({
+                error: "password does not match with mobile number.",
+              });
+            }
+          }
+        }
+
+        // no -> admin has not given such priviliges
+        // normal login : check password -> check deviceId
+        // if password is not mathing -> 401
+        // if yes check if deviceId is matching or not
+        // finally issues the token
+        else {
+          if (user.password === encry_password) {
+            // password matched
+            if (user.deviceId === deviceId) {
+              // deviceId matched
+              // issue token
+              const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+                expiresIn: "1d",
+              });
+
+              const {
+                _id,
+                firstName,
+                lastName,
+                email,
+                mobile,
+                birthdate,
+                goalSelected,
+                role,
+                gender,
+                deviceId,
+                isAccountRegistered,
+                isGoalSelected,
+                isAccountVerified,
+                profileImage,
+              } = user;
+
+              return res.status(200).json({
+                _id,
+                token,
+                firstName,
+                lastName,
+                email,
+                mobile,
+                birthdate,
+                goalSelected,
+                role,
+                gender,
+                deviceId,
+                isAccountRegistered,
+                isGoalSelected,
+                isAccountVerified,
+                profileImage,
+              });
+            } else {
+              // no device not matched
+              return res.status(400).json({
+                error:
+                  "Do not try to login other than your registered device. If you have changed your device, Kindly contact us.",
+              });
+            }
+          } else {
+            return res.status(401).json({
+              error: "password does not match with mobile number.",
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      req.status(500).send(error);
     }
-  });
+  }
 };
 
 exports.resetPassword = async (req, res) => {
@@ -395,3 +554,181 @@ exports.tokenVerify = async (req, res, next) => {
 //     }
 //   });
 // };
+
+// User.findOne({ mobile }, (err, user) => {
+//   // mobile number will always be in DB. so no error
+//   // map password
+//   if (err || !user) {
+//     return res.status(404).json({
+//       error: "error in finding mobile number.",
+//     });
+//   }
+
+//   if (user.password === encry_password) {
+//     // if password is correct generate token
+//     const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+//       expiresIn: "1d",
+//     });
+
+//     const {
+//       _id,
+//       firstName,
+//       lastName,
+//       email,
+//       mobile,
+//       birthdate,
+//       goalSelected,
+//       role,
+//       gender,
+//       isAccountRegistered,
+//       isGoalSelected,
+//       isAccountVerified,
+//       profileImage,
+//     } = user;
+
+//     return res.status(200).json({
+//       _id,
+//       token,
+//       firstName,
+//       lastName,
+//       email,
+//       mobile,
+//       birthdate,
+//       goalSelected,
+//       role,
+//       gender,
+//       isAccountRegistered,
+//       isGoalSelected,
+//       isAccountVerified,
+//       profileImage,
+//     });
+//   } else {
+//     return res.status(401).json({
+//       error: "password does not match with mobile number.",
+//     });
+//   }
+// });
+
+// try {
+//   const user = await User.findOne({ mobile: mobile });
+//   if (!user) {
+//     return res.status(404).json({
+//       error: "error in finding mobile number.",
+//     });
+//   } else {
+//     if (user.allowDeviceIdChange === true) {
+//       // user can change the device id
+//       changeDeviceId = await User.findOneAndUpdate(
+//         { mobile: mobile },
+//         { $set: { deviceId: deviceId, allowDeviceIdChange: false } },
+//         { new: true }
+//       );
+
+//       if (!changeDeviceId) {
+//         return res.status(404).json({
+//           error: "You have changed your device. Kindly contact us.",
+//         });
+//       } else {
+//         // now check for password
+//         if (user.password === encry_password) {
+//           const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+//             expiresIn: "1d",
+//           });
+
+//           const {
+//             _id,
+//             firstName,
+//             lastName,
+//             email,
+//             mobile,
+//             birthdate,
+//             goalSelected,
+//             role,
+//             gender,
+//             deviceId,
+//             isAccountRegistered,
+//             isGoalSelected,
+//             isAccountVerified,
+//             profileImage,
+//           } = user;
+
+//           return res.status(200).json({
+//             _id,
+//             token,
+//             firstName,
+//             lastName,
+//             email,
+//             mobile,
+//             birthdate,
+//             goalSelected,
+//             role,
+//             gender,
+//             deviceId,
+//             isAccountRegistered,
+//             isGoalSelected,
+//             isAccountVerified,
+//             profileImage,
+//           });
+//         } else {
+//           return res.status(401).json({
+//             error: "password does not match with mobile number.",
+//           });
+//         }
+//       }
+//     }
+//     // check if IMEI is matching with deviceId
+//     if (user.deviceId === deviceId) {
+//       // device id is matched now check if password is matching
+//       if (user.password === encry_password) {
+//         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
+//           expiresIn: "1d",
+//         });
+
+//         const {
+//           _id,
+//           firstName,
+//           lastName,
+//           email,
+//           mobile,
+//           birthdate,
+//           goalSelected,
+//           role,
+//           gender,
+//           isAccountRegistered,
+//           isGoalSelected,
+//           isAccountVerified,
+//           profileImage,
+//         } = user;
+
+//         return res.status(200).json({
+//           _id,
+//           token,
+//           firstName,
+//           lastName,
+//           email,
+//           mobile,
+//           birthdate,
+//           goalSelected,
+//           role,
+//           gender,
+//           isAccountRegistered,
+//           isGoalSelected,
+//           isAccountVerified,
+//           profileImage,
+//         });
+//       } else {
+//         return res.status(401).json({
+//           error: "password does not match with mobile number.",
+//         });
+//       }
+//     } else {
+//       return res.status(400).json({
+//         error:
+//           "Do not try to login other than your registered device. If you have changed your device, Kindly contact us.",
+//       });
+//     }
+//   }
+// } catch (error) {
+//   console.log(error);
+//   res.status(500).send(error);
+// }
