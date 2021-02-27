@@ -219,7 +219,7 @@ exports.loginUser = async (req, res) => {
       // else user found check if password is matching or not
       if (user.password === encry_password) {
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "1d",
+          expiresIn: "120s",
         });
 
         const {
@@ -294,7 +294,7 @@ exports.loginUser = async (req, res) => {
             // now check for password
             if (user.password === encry_password) {
               const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-                expiresIn: "1d",
+                expiresIn: "120s",
               });
 
               const {
@@ -351,7 +351,7 @@ exports.loginUser = async (req, res) => {
               // deviceId matched
               // issue token
               const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-                expiresIn: "1d",
+                expiresIn: "120s",
               });
 
               const {
@@ -459,7 +459,7 @@ exports.intializeResetPassword = async (req, res) => {
       } else {
         const userId = user._id;
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "1d",
+          expiresIn: "120s",
         });
 
         fetch(
@@ -505,7 +505,7 @@ exports.getNewToken = async (req, res) => {
     if (userHashFromDB.userHash == "") {
       // userHash is empty; directly create new token and send
       let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
-        expiresIn: "1d",
+        expiresIn: "120s",
       });
 
       let newTokenData = token.toString().split(".")[2];
@@ -541,7 +541,7 @@ exports.getNewToken = async (req, res) => {
       if (userHashFromDB.userHash == userHash) {
         // generate new token
         let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
-          expiresIn: "1d",
+          expiresIn: "120s",
         });
 
         let newTokenData = token.toString().split(".")[2];
