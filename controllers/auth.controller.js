@@ -580,21 +580,26 @@ exports.getNewToken = async (req, res) => {
 exports.logout = async (req, res) => {
   const userId = req.query.userId;
 
-  const user = await User.findOneAndUpdate(
-    { id: userId },
-    { $set: { userHash: "" } },
-    { new: true }
-  );
+  try {
+    const user = await User.findOneAndUpdate(
+      { id: userId },
+      { $set: { userHash: "" } },
+      { new: true }
+    );
 
-  if (!user) {
-    return res.status(400).json({
-      error: "couldn't find this user in DB",
+    if (!user) {
+      return res.status(400).json({
+        error: "couldn't find this user in DB",
+      });
+    }
+
+    return res.status(200).json({
+      message: "success",
     });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
   }
-
-  return res.status(200).json({
-    message: "success",
-  });
 };
 
 // ================================= MIDDLEWARES ================================================
