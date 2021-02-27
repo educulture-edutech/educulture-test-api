@@ -74,6 +74,7 @@ exports.registerUser = async (req, res) => {
     allowDeviceIdChange: false,
     birthdate: birthdate,
     isAccountRegistered: true,
+    userHash: "",
   });
 
   console.log(user);
