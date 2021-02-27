@@ -583,7 +583,7 @@ exports.logout = async (req, res) => {
 
   try {
     const user = await User.findOneAndUpdate(
-      { id: userId },
+      { _id: userId },
       { $set: { userHash: "" } },
       { new: true }
     );
