@@ -16,6 +16,8 @@ const {
   getSubjectData,
   getSubjectById,
   updateSubject,
+  getSubjectTemp,
+  getSubtopicData,
 } = require("../controllers/subject.controller");
 
 // ================== PARAMS =======================================
@@ -57,6 +59,22 @@ router.get(
   isSignIn,
   isAuthenticated,
   getSubjectData
+);
+
+router.get(
+  "/subject/get-subject-temp/:userId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  getSubjectTemp
+);
+
+router.get(
+  "/subject/get-subtopic-data/:userId",
+  tokenVerify,
+  isSignIn,
+  isAuthenticated,
+  getSubtopicData
 );
 
 router.get(

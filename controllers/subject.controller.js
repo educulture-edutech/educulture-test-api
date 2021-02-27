@@ -280,6 +280,124 @@ exports.getAdvertisements = async (req, res) => {
   }
 };
 
+exports.getSubjectTemp = async (req, res) => {
+  const subjectId = req.query.subjectId;
+  let subtopicList = [];
+
+  try {
+    const subject = await Subject.findOne({ _id: subjectId });
+
+    if (!subject) {
+      return res.status(404).json({
+        error: "subject not found in database",
+      });
+    }
+
+    for (let i = 0; i < subject.subtopics.length; i++) {
+      subtopicList.push({
+        subtopicName: subject.subtopics[i].subtopicName,
+        subtopicId: subject.subtopics[i].subtopicId,
+      });
+    }
+
+    return res.status(200).json({
+      subjectName: subject.subjectName,
+      instructor: subject.instructor,
+      price: subject.price,
+      subjectDescription: subject.subjectDescription,
+      duration: subject.duration,
+      subtopics: subtopicList,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(404).end();
+  }
+};
+
+// this api will be called only when user has purchased the course
+
+exports.getSubtopicData = async (req, res) => {
+  let subjectId = req.query.subjectId;
+  let subtopicId = req.query.subtopicId.toString();
+
+  try {
+    const subjectData = await Subject.findOne({ _id: subjectId }).select([
+      "subtopics",
+    ]);
+
+    let index = Number(subtopicId.split("-")[2]) - 1;
+    let chapterList = subjectData.subtopics[index].chapters;
+
+    const user = await User.findOne({ _id: req.profile._id }).select([
+      "userPurchaseList",
+    ]);
+
+    if (user.userPurchaseList.length < 0) {
+      return res.status(200).json({
+        chapters: await nullChapterList(chapterList),
+      });
+    }
+
+    for (let i = 0; i < user.userPurchaseList.length; i++) {
+      if (
+        user.userPurchaseList[i].subject_id == subjectId &&
+        user.userPurchaseList[i].isExpired == false
+      ) {
+        // subject is in user purchase list and expiry date is not crossed
+        if (
+          (await checkForExpiryDate(user.userPurchaseList[i].expiryDate)) ===
+          true
+        ) {
+          // expiry date is crossed
+          let updatedUserPurchaseList = user.userPurchaseList;
+          updatedUserPurchaseList[i].isExpired = true;
+
+          const updatedUser = await User.findOneAndUpdate(
+            { _id: req.profile._id },
+            { $set: { userPurchaseList: updatedUserPurchaseList } },
+            { new: true }
+          );
+
+          if (!updatedUser) {
+            return res.status(500).json({
+              error: "userPurchaseList is not updated.",
+            });
+          }
+
+          return res.status(200).json({
+            chapters: await nullChapterList(chapterList),
+          });
+        } else {
+          return res.status(200).json({
+            chapters: chapterList,
+          });
+        }
+      } else {
+        return res.status(200).json({
+          chapters: await nullChapterList(chapterList),
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+};
+
+const checkForExpiryDate = async (expiryDate) => {
+  const currentDate = dayjs().tz("Asia/Kolkata");
+  if (currentDate.isAfter(dayjs(expiryDate))) return true;
+  else return false;
+};
+
+const nullChapterList = async (chapterList) => {
+  for (let i = 0; i < chapterList.length; i++) {
+    chapterList[i].url = null;
+  }
+
+  return chapterList;
+};
+
 // sample stringify json data for creating new subject
 
 /*

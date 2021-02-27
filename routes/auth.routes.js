@@ -14,6 +14,8 @@ const {
   resetPassword,
   intializeResetPassword,
   tokenVerify,
+  getNewToken,
+  logout,
 } = require("../controllers/auth.controller");
 const { getUserById } = require("../controllers/user.controller");
 
@@ -52,5 +54,9 @@ router.put(
 );
 
 router.get("/account/initialize-reset-password", intializeResetPassword);
+
+router.post("/account/new-token/:userId", getNewToken);
+
+router.post("/account/logout", logout);
 
 module.exports = router;

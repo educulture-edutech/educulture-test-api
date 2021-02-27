@@ -488,6 +488,115 @@ exports.intializeResetPassword = async (req, res) => {
   }
 };
 
+exports.getNewToken = async (req, res) => {
+  const tokenDataFromClient = req.body.tokenDataFromClient.toString();
+  const mobile = req.body.mobile.toString();
+
+  try {
+    const userHashFromDB = await User.findOne({ _id: req.profile._id }).select([
+      "userHash",
+    ]);
+
+    if (!userHashFromDB)
+      return res.status(400).json({
+        error: "couldn't create new token",
+      });
+
+    if (userHashFromDB.userHash == "") {
+      // userHash is empty; directly create new token and send
+      let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
+        expiresIn: "1d",
+      });
+
+      let newTokenData = token.toString().split(".")[2];
+      let userHash = await generateUserHash(newTokenData, mobile);
+
+      // update this in database
+      const updateUserHash = await User.findOneAndUpdate(
+        { _id: req.profile._id },
+        { $set: { userHash: userHash } },
+        { new: true }
+      );
+
+      if (!updateUserHash) {
+        return res.status(400).json({
+          error: "couldn't create new token",
+        });
+      }
+
+      // return new token
+      return res.status(200).json({
+        token: token,
+      });
+    }
+
+    // userHash is already present in the database
+    else {
+      let userHash = await generateUserHash(
+        tokenDataFromClient.toString().split(".")[2],
+        mobile
+      );
+
+      // check if this userHash matches with userHash present in DB
+      if (userHashFromDB.userHash == userHash) {
+        // generate new token
+        let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
+          expiresIn: "1d",
+        });
+
+        let newTokenData = token.toString().split(".")[2];
+
+        // generate userHash from this new token
+        userHash = await generateUserHash(newTokenData, mobile);
+
+        // update the new userHash in DB
+        const updateUserHash = await User.findOneAndUpdate(
+          { _id: req.profile._id },
+          { $set: { userHash: userHash } },
+          { new: true }
+        );
+
+        if (!updateUserHash) {
+          return res.status(400).json({
+            error: "couldn't create new token",
+          });
+        }
+
+        return res.status(200).json({
+          token: token,
+        });
+      } else {
+        return res.status(400).json({
+          error: "couldn't create new token",
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+};
+
+exports.logout = async (req, res) => {
+  const userId = req.query.userId;
+
+  const user = await User.findOneAndUpdate(
+    { id: userId },
+    { $set: { userHash: "" } },
+    { new: true }
+  );
+
+  if (!user) {
+    return res.status(400).json({
+      error: "couldn't find this user in DB",
+    });
+  }
+
+  return res.status(200).json({
+    message: "success",
+  });
+};
+
 // ================================= MIDDLEWARES ================================================
 
 exports.isSignIn = expressjwt({
@@ -535,6 +644,20 @@ exports.tokenVerify = async (req, res, next) => {
   } catch (error) {
     return res.status(406).end();
   }
+};
+
+// ================================= HELPER FUNCTIONS ==========================================
+
+const generateUserHash = async (tokenData, mobile) => {
+  let hashDataString = tokenData.concat(mobile);
+  let userHash = crypto
+    .createHmac("sha256", process.env.SECRET)
+    .update(hashDataString)
+    .digest("hex");
+
+  console.log("new userHash: ", userHash);
+
+  return userHash;
 };
 
 // exports.isTokenExpired = async (req, res, next) => {

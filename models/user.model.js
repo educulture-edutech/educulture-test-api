@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
+    userHash: {
+      type: String,
+      trim: true,
+    },
+
     birthdate: {
       type: String,
       required: true,
