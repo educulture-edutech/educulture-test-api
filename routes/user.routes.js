@@ -63,12 +63,7 @@ router.post(
   pushSubjectToUserPurchaseList
 );
 
-router.delete(
-  "/user/delete-account/:userId",
-  isSignIn,
-  isAuthenticated,
-  deleteAccount
-);
+router.delete("/user/delete-account", deleteAccount);
 
 // ----------------- this is temp route ---------------
 

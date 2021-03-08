@@ -22,6 +22,12 @@ const subjectSchema = new mongoose.Schema(
       trim: true,
     },
 
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     subjectDescription: {
       type: String,
       trim: true,

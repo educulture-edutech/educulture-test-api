@@ -133,7 +133,7 @@ exports.sendOTP = async (req, res) => {
 
   if (typeof mobile !== "undefined" && mobile.length === 10) {
     fetch(
-      `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
+      `https://api.msg91.com/api/v5/otp?extra_param={"COMPANY_NAME":"Educulture", "Param2":"Value2", "Param3": "Value3"}&authkey=345746ARD5Rwyrwq9R5f998e59P1&DLT_TE_ID=1207160991834012359&template_id=5f9e5df3c34bf71c99465912&mobile=91${mobile}&invisible=1`,
       {
         method: "GET",
         port: null,
@@ -220,7 +220,7 @@ exports.loginUser = async (req, res) => {
       // else user found check if password is matching or not
       if (user.password === encry_password) {
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "120s",
+          expiresIn: "1d",
         });
 
         const {
@@ -295,7 +295,7 @@ exports.loginUser = async (req, res) => {
             // now check for password
             if (user.password === encry_password) {
               const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-                expiresIn: "120s",
+                expiresIn: "1d",
               });
 
               const {
@@ -352,7 +352,7 @@ exports.loginUser = async (req, res) => {
               // deviceId matched
               // issue token
               const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-                expiresIn: "120s",
+                expiresIn: "1d",
               });
 
               const {
@@ -460,7 +460,7 @@ exports.intializeResetPassword = async (req, res) => {
       } else {
         const userId = user._id;
         const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
-          expiresIn: "120s",
+          expiresIn: "1d",
         });
 
         fetch(
@@ -506,7 +506,7 @@ exports.getNewToken = async (req, res) => {
     if (userHashFromDB.userHash == "") {
       // userHash is empty; directly create new token and send
       let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
-        expiresIn: "120s",
+        expiresIn: "1d",
       });
 
       let newTokenData = token.toString().split(".")[2];
@@ -542,7 +542,7 @@ exports.getNewToken = async (req, res) => {
       if (userHashFromDB.userHash == userHash) {
         // generate new token
         let token = jwt.sign({ _id: userHashFromDB._id }, process.env.SECRET, {
-          expiresIn: "120s",
+          expiresIn: "1d",
         });
 
         let newTokenData = token.toString().split(".")[2];

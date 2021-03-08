@@ -136,9 +136,10 @@ exports.getUserPurchaseList = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
   console.log("visited");
+  const mobile = req.query.mobile;
 
   try {
-    const user = await User.deleteOne({ _id: req.profile._id });
+    const user = await User.deleteOne({ mobile: mobile });
     if (!user) {
       return res.status(404).json({
         error: "user not found in DB",

@@ -384,6 +384,18 @@ exports.getSubtopicData = async (req, res) => {
   }
 };
 
+const getUniqueCategoriesUnderGoalId = async (req, res) => {
+  const goalId = req.query.goalId;
+
+  const uniqueCategories = await Subject.find({ goalId: goalId }).distinct(
+    "category"
+  );
+
+  console.log(uniqueCategories);
+};
+
+// ====================== FUNCTIONS ====================================================
+
 const checkForExpiryDate = async (expiryDate) => {
   const currentDate = dayjs().tz("Asia/Kolkata");
   if (currentDate.isAfter(dayjs(expiryDate))) return true;
